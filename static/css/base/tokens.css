@@ -1,0 +1,99 @@
+/*
+  NoteSwap design tokens. Every colour, size and timing on the site comes from here;
+  change a value once and it changes everywhere.
+
+  Colour rules
+  - Greens and grays only. No red, blue, purple or gold.
+  - --green-500 is the brand green (logo, stars, focus ring, small accents).
+    White text on it is too low-contrast, so buttons and links use --green-700.
+  - --green-900 is for dark bands and the Premium badge.
+  - Errors use --ink with an icon, never a colour of their own.
+*/
+:root {
+  /* Greens */
+  --green-50: #EEF8F3;
+  --green-100: #DDF2E8;
+  --green-200: #CDEBDC;
+  --green-300: #7FDDB5;
+  --green-500: #0EB582;
+  --green-600: #0A9F6E;
+  --green-700: #0B7D57;
+  --green-800: #08664A;
+  --green-900: #0A3D2C;
+
+  /* Neutrals */
+  --ink: #16211C;
+  --text: #3F4B45;
+  --muted: #66726C;
+  --placeholder: #7E8A84;
+  --line-strong: #D3DBD7;
+  --line: #E4E9E6;
+  --gray-100: #F0F3F1;
+  --surface: #F6F8F7;
+  --white: #FFFFFF;
+
+  /* Text on dark green bands */
+  --on-dark: #FFFFFF;
+  --on-dark-muted: #C9E6D8;
+
+  /* Type */
+  --font: 'Nunito', ui-rounded, 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --fs-display: clamp(2.25rem, 1.4rem + 3.4vw, 3.5rem);   /* 36 → 56 */
+  --fs-h1: clamp(1.75rem, 1.4rem + 1.4vw, 2.25rem);       /* 28 → 36 */
+  --fs-h2: clamp(1.5rem, 1.3rem + 0.8vw, 1.75rem);        /* 24 → 28 */
+  --fs-h3: 1.125rem;                                      /* 18 */
+  --fs-lead: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);   /* 17 → 19 */
+  --fs-body: 1rem;                                        /* 16 */
+  --fs-small: 0.875rem;                                   /* 14 */
+  --fs-cap: 0.8125rem;                                    /* 13 */
+  --fs-eyebrow: 0.78125rem;                               /* 12.5 */
+
+  /* Space (4px steps) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-12: 48px;
+  --s-14: 56px;
+  --s-16: 64px;
+  --s-24: 96px;
+  --section-gap: clamp(64px, 8vw, 96px);
+
+  /* Layout */
+  --page-max: 1200px;
+  --gutter: clamp(16px, 4vw, 32px);
+  --header-h: 72px;
+
+  /* Shape */
+  --r-sm: 8px;
+  --r-md: 10px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+  --r-2xl: 20px;
+  --r-3xl: 24px;
+  --r-pill: 999px;
+
+  /* Depth: borders do most of the work; shadows only for floating things */
+  --shadow-hover: 0 10px 28px rgba(22, 33, 28, .07);
+  --shadow-float: 0 16px 36px rgba(22, 33, 28, .10);
+  --shadow-pop: 0 12px 32px rgba(22, 33, 28, .18);
+  --focus-ring: 0 0 0 4px rgba(14, 181, 130, .22);
+
+  /* Motion */
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --t-fast: 150ms;
+  --t-med: 240ms;
+  --t-slow: 600ms;
+
+  --z-header: 50;
+  --z-menu: 60;
+  --z-toast: 70;
+}
+
+@media (max-width: 900px) {
+  :root { --header-h: 64px; }
+}

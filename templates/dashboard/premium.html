@@ -1,0 +1,111 @@
+{% extends "dashboard/_layout.html" %}
+{% load ui humanize %}
+{% block title %}Premium · Manage{% endblock %}
+
+{% block manage %}
+<div class="manage-head">
+  <div>
+    <h1 class="t-h1">Premium</h1>
+    <p class="muted">Approve purchases after you’ve checked the payment. Approved students get NoteSolve right away; renewals are added after their current Premium ends.</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'add_premium_package' %}">{% icon "plus" size="sm" %}Add a package</a>
+</div>
+
+<section class="card table-card">
+  <div class="table-card__head"><h2 class="t-h3">Waiting for approval <span class="count{% if pending_purchases %} count-g{% endif %}">{{ pending_purchases|length }}</span></h2></div>
+  {% if pending_purchases %}
+    <div class="table-scroll">
+      <table class="table table--stack">
+        <thead><tr><th>Student</th><th>Package</th><th>Amount</th><th>Ordered</th><th class="is-right">Actions</th></tr></thead>
+        <tbody>
+          {% for purchase in pending_purchases %}
+            <tr>
+              <td><a class="table-person" href="{% url 'user_profile' purchase.user.id %}">{% avatar purchase.user 26 %}{{ purchase.user|display_name }}</a></td>
+              <td class="t-small stack-start">{{ purchase.package_name }}</td>
+              <td class="t-small ink strong stack-end">৳ {{ purchase.amount|floatformat:0 }}</td>
+              <td class="t-small muted" data-label="Ordered">{{ purchase.timestamp|naturaltime }}</td>
+              <td>
+                <div class="table-actions">
+                  <button class="btn btn-secondary btn-sm" type="button" data-dialog-open="reject-order-{{ purchase.id }}">Reject…</button>
+                  <form method="post" action="{% url 'approve_purchase' purchase.id %}">{% csrf_token %}<button class="btn btn-primary btn-sm" type="submit">Approve</button></form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="table-card__empty"><div class="empty"><span class="empty__icon">{% icon "crown" %}</span><span class="empty__title">No purchases waiting</span></div></div>
+  {% endif %}
+</section>
+
+{# Reject pop-ups, one per waiting order (opened by the row's "Reject…" button, js/core/dialogs.js) #}
+{% for purchase in pending_purchases %}
+  <dialog class="dialog" id="reject-order-{{ purchase.id }}" aria-labelledby="reject-order-{{ purchase.id }}-title">
+    <form class="dialog__body" method="post" action="{% url 'reject_purchase' purchase.id %}">
+      {% csrf_token %}
+      <div class="dialog__head">
+        <div>
+          <h2 class="t-h2" id="reject-order-{{ purchase.id }}-title">Reject this order?</h2>
+          <p class="t-small muted">{{ purchase.user|display_name }} · {{ purchase.package_name }} · ৳ {{ purchase.amount|floatformat:0 }} · ordered {{ purchase.timestamp|naturaltime }}</p>
+        </div>
+        <button class="btn btn-ghost btn-icon dialog__close" type="button" data-dialog-close aria-label="Close">{% icon "x" %}</button>
+      </div>
+      <div class="field">
+        <label class="label" for="reason-{{ purchase.id }}">Reason (the student sees this)</label>
+        <textarea class="input" id="reason-{{ purchase.id }}" name="reason" rows="3" maxlength="1000" required placeholder="e.g. We couldn’t find this payment. Please check the number you paid."></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Reject order</button>
+        <button class="btn btn-ghost is-plain" type="button" data-dialog-close>Cancel</button>
+      </div>
+    </form>
+  </dialog>
+{% endfor %}
+
+<section class="stack" style="--stack: 16px">
+  <h2 class="t-h3">Packages</h2>
+  <div class="grid grid-3">
+    {% for package in packages %}
+      <article class="card card-pad package-admin{% if not package.is_active %} is-off-sale{% endif %}">
+        <div class="package-admin__head"><h3 class="t-h3">{{ package.name }}</h3><span class="chip chip-line chip-sm">{{ package.duration_in_months }} month{{ package.duration_in_months|pluralize }}</span>{% if not package.is_active %}<span class="chip chip-gray chip-sm">Off sale</span>{% endif %}</div>
+        <p class="package-admin__price">৳ {{ package.price|floatformat:0 }}</p>
+        <p class="t-small muted">{{ package.description|truncatechars:140 }}</p>
+        <p class="t-cap">{% if package.order_count %}{{ package.order_count }} order{{ package.order_count|pluralize }} — can’t be deleted, only taken off sale{% else %}No orders yet{% endif %}</p>
+        <div class="table-actions">
+          <a class="btn btn-secondary btn-sm" href="{% url 'edit_premium_package' package.id %}">{% icon "edit" size="sm" %}Edit</a>
+          <form method="post" action="{% url 'toggle_premium_package' package.id %}">{% csrf_token %}<button class="btn btn-ghost btn-sm is-plain" type="submit">{% if package.is_active %}{% icon "eye" size="sm" %}Take off sale{% else %}{% icon "plus" size="sm" %}Put on sale{% endif %}</button></form>
+          {% if not package.order_count %}
+            <form method="post" action="{% url 'delete_premium_package' package.id %}">{% csrf_token %}<button class="btn btn-ghost btn-sm is-plain" type="submit" data-confirm="Delete the “{{ package.name }}” package?">{% icon "trash" size="sm" %}Delete</button></form>
+          {% endif %}
+        </div>
+      </article>
+    {% empty %}
+      <div class="empty"><span class="empty__icon">{% icon "crown" %}</span><span class="empty__title">No packages yet</span><p>Students can’t buy Premium until you add one.</p><a class="btn btn-secondary btn-sm" href="{% url 'add_premium_package' %}">Add a package</a></div>
+    {% endfor %}
+  </div>
+</section>
+
+{% if recent_purchases %}
+  <section class="card table-card">
+    <div class="table-card__head"><h2 class="t-h3">Recently reviewed</h2></div>
+    <div class="table-scroll">
+      <table class="table table--stack">
+        <thead><tr><th>Student</th><th>Package</th><th>Amount</th><th>Result</th><th>Reviewed</th></tr></thead>
+        <tbody>
+          {% for purchase in recent_purchases %}
+            <tr>
+              <td><span class="table-person">{% avatar purchase.user 26 %}{{ purchase.user|display_name }}</span></td>
+              <td class="t-small stack-start">{{ purchase.package_name }}</td>
+              <td class="t-small stack-end">৳ {{ purchase.amount|floatformat:0 }}</td>
+              <td class="t-small">{% if purchase.status == 'approved' %}<span class="chip chip-sm">{% icon "check" %}Approved</span> <span class="muted">{{ purchase.starts_at|date:"j M Y" }} – {{ purchase.ends_at|date:"j M Y" }}</span>{% else %}<span class="chip chip-line chip-sm">{% icon "x" %}Rejected</span> <span class="muted">{{ purchase.rejection_reason|truncatechars:60 }}</span>{% endif %}</td>
+              <td class="t-small muted" data-label="Reviewed">{{ purchase.reviewed_at|date:"j M Y" }}{% if purchase.reviewed_by %}<br>by {{ purchase.reviewed_by|display_name }}{% endif %}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endif %}
+{% endblock %}

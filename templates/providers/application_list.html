@@ -1,0 +1,59 @@
+{% extends "dashboard/_layout.html" %}
+{% load ui humanize %}
+{% block title %}Provider applications{% endblock %}
+
+{% block manage %}
+<div class="manage-head">
+  <div>
+    <h1 class="t-h1">Provider applications</h1>
+    <p class="muted">Accepted applicants can upload notes straight away. Rejected applicants see your reason and can apply again after 30 days.</p>
+  </div>
+</div>
+
+{% if requests %}
+  <div class="application-list" data-reveal-stagger>
+    {% for req in requests %}
+      <article class="card application-card">
+        <div class="application-card__who">
+          {% avatar req.user 48 %}
+          <div>
+            <h2 class="t-h3">{{ req.first_name }} {{ req.last_name }}</h2>
+            <p class="t-cap">@{{ req.user.username }} · applied {{ req.submitted_at|naturaltime }}</p>
+          </div>
+          <a class="btn btn-ghost btn-sm" href="{% url 'provider_request_detail' req.id %}">All details{% icon "arrow" size="sm" cls="icon-arrow" %}</a>
+        </div>
+        <dl class="application-card__facts">
+          <div><dt>University</dt><dd>{{ req.university|uni_full }}</dd></div>
+          <div><dt>Department</dt><dd>{{ req.department }}</dd></div>
+          <div><dt>CGPA</dt><dd>{{ req.cgpa }}</dd></div>
+          <div><dt>Profession</dt><dd>{{ req.profession }}</dd></div>
+        </dl>
+        {% include "providers/_application_actions.html" %}
+      </article>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty"><span class="empty__icon">{% icon "users" %}</span><span class="empty__title">No pending provider requests.</span><p>New applications show up here.</p></div>
+{% endif %}
+
+{% if reviewed %}
+  <section class="card table-card">
+    <div class="table-card__head"><h2 class="t-h3">Recently reviewed</h2></div>
+    <div class="table-scroll">
+      <table class="table table--stack">
+        <thead><tr><th>Applicant</th><th>University</th><th>Result</th><th>Reviewed</th></tr></thead>
+        <tbody>
+          {% for req in reviewed %}
+            <tr>
+              <td class="stack-start"><a class="table-person" href="{% url 'provider_request_detail' req.id %}">{% avatar req.user 26 %}{{ req.first_name }} {{ req.last_name }}</a></td>
+              <td class="t-small" data-label="University">{{ req.university|uni_short }}</td>
+              <td class="stack-end">{% if req.status == 'accepted' %}<span class="chip chip-sm">{% icon "check" %}Accepted</span>{% else %}<span class="chip chip-line chip-sm">{% icon "x" %}Rejected</span>{% endif %}</td>
+              <td class="t-small muted{% if not req.reviewed_at %} stack-hide{% endif %}" data-label="Reviewed">{{ req.reviewed_at|naturaltime|default:"—" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endif %}
+{% endblock %}

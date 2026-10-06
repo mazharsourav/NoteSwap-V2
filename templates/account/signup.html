@@ -1,0 +1,37 @@
+{% extends "allauth/layouts/entrance.html" %}
+{% load ui %}
+{% block head_title %}Create an account{% endblock %}
+
+{% block content %}
+<div class="auth__head">
+  <h1 class="t-h1">Create your account</h1>
+  <p class="muted">Free for every student. We’ll email you a link to confirm your address.</p>
+</div>
+
+{% if google_login_enabled %}
+  {% include "account/_google_button.html" with label="Sign up with Google" %}
+  <div class="auth__or"><span>or fill in the form</span></div>
+{% endif %}
+
+<form class="auth-form" method="post" action="{% url 'account_signup' %}" novalidate>
+  {% csrf_token %}
+  {{ redirect_field }}
+  {% include "components/_form_errors.html" %}
+  <div class="field-row">
+    {% include "components/_field.html" with field=form.first_name label="First name" %}
+    {% include "components/_field.html" with field=form.last_name label="Last name" %}
+  </div>
+  {% include "components/_field.html" with field=form.username label="Username" hint="Shown on your comments and reviews." %}
+  {% include "components/_field.html" with field=form.email label="Email" %}
+  <div class="field-row">
+    {% include "components/_field.html" with field=form.university label="University" %}
+    {% include "components/_field.html" with field=form.gender label="Gender" %}
+  </div>
+  {% include "account/_password_field.html" with field=form.password1 label="Password" %}
+  {% include "account/_password_field.html" with field=form.password2 label="Confirm password" %}
+  <p class="t-cap">By creating an account you agree to the <a href="{% url 'terms_of_use' %}">Terms of use</a>.</p>
+  <button class="btn btn-primary btn-lg btn-block" type="submit">Create account</button>
+</form>
+
+<p class="auth__switch t-small muted">Already have an account? <a class="strong" href="{% url 'account_login' %}{% if redirect_field_value %}?next={{ redirect_field_value|urlencode }}{% endif %}">Sign in</a></p>
+{% endblock %}

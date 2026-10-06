@@ -1,0 +1,9 @@
+{% autoescape off %}New Premium order to review:
+
+Student: {{ student.get_full_name|default:student.username }} ({{ student.username }}, {{ student.email|default:"no email" }})
+Plan: {{ purchase.package_name }}, {{ purchase.duration_in_months }} month{{ purchase.duration_in_months|pluralize }}
+Amount: Tk {{ purchase.amount|floatformat:0 }}
+
+Check the payment, then approve or reject it:
+{{ link }}
+{% endautoescape %}

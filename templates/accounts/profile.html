@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% load static ui humanize %}
+{% block title %}Your profile{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/account.css' %}">{% endblock %}
+
+{% block main %}
+<main id="main" class="account-page">
+  <div class="wrap account-layout">
+    {% include "account/_settings_nav.html" %}
+
+    <div class="account-content">
+      <section class="card profile-hero">
+        {% avatar user 88 %}
+        <div class="profile-hero__text">
+          <h1 class="t-h1">{{ user|display_name }}</h1>
+          <span class="muted">@{{ user.username }} · {% if user.is_superuser %}Superuser{% elif user.user_type == 'moderator' %}Moderator{% elif user.user_type == 'provider' %}Provider{% else %}Student{% endif %}{% if is_premium_user %} · Premium{% endif %}</span>
+          <div class="cluster">
+            {% if user.university %}<span class="chip" title="{{ user.university|uni_full }}">{{ user.university|uni_short }}</span>{% endif %}
+            {% if user.department %}<span class="chip chip-gray">{{ user.department }}</span>{% endif %}
+            {% if is_premium_user %}<span class="chip chip-deep">{% icon "crown" %}Premium</span>{% endif %}
+          </div>
+        </div>
+        <div class="profile-hero__actions">
+          <a class="btn btn-secondary" href="{% url 'edit_profile' %}">{% icon "edit" size="sm" %}Edit profile</a>
+          {% if user.user_type == 'provider' %}<a class="btn btn-ghost" href="{% url 'provider_profile' user.id %}">{% icon "eye" size="sm" %}Public page</a>{% endif %}
+        </div>
+      </section>
+
+      {% if my_notes is not None %}
+        <section class="card card-pad">
+          <div class="card-head">
+            <div>
+              <h2 class="t-h3">Your notes</h2>
+              <p class="t-cap">{{ published_count }} published · {{ pending_count }} waiting for review{% if rejected_count %} · {{ rejected_count }} not approved{% endif %} · {{ follower_count }} follower{{ follower_count|pluralize }}. Followers are notified when you publish a note.</p>
+            </div>
+            <a class="btn btn-primary btn-sm" href="{% url 'upload_note' %}">{% icon "upload" size="sm" %}Upload</a>
+          </div>
+          {% if my_notes %}
+            <ul class="row-list">
+              {% for note in my_notes %}
+                <li>
+                  <a class="row-list__item" href="{% url 'note_detail' note.id %}">
+                    {% include "components/_note_cover.html" with size="sm" cls="row-list__doc" %}
+                    <span class="row-list__text"><span class="t-small ink strong">{{ note.name }}</span><span class="t-cap">{{ note.subject.name }} · {{ note.uploaded_at|naturaltime }}</span></span>
+                    {% if note.is_verified %}<span class="chip chip-sm">{% icon "check" %}Published</span>{% elif note.is_rejected %}<span class="chip chip-line chip-sm">{% icon "alert" %}Not approved</span>{% else %}<span class="chip chip-gray chip-sm">{% icon "clock" %}In review</span>{% endif %}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="empty"><span class="empty__icon">{% icon "upload" %}</span><span class="empty__title">No notes yet</span><p>Upload your first note. A moderator checks it, then it goes live.</p></div>
+          {% endif %}
+        </section>
+      {% endif %}
+
+      <div class="profile-grid">
+        <section class="card card-pad">
+          <h2 class="t-h3">Details</h2>
+          <dl class="details">
+            <div><dt>Email</dt><dd>{{ user.email|default:"Not set" }}</dd></div>
+            <div><dt>University</dt><dd>{{ user.university|uni_full|default:"Not set" }}</dd></div>
+            <div><dt>Department</dt><dd>{{ user.department|default:"Not set" }}</dd></div>
+            <div><dt>City</dt><dd>{{ user.city|default:"Not set" }}</dd></div>
+            <div><dt>Gender</dt><dd>{{ user.gender|default:"Not set"|capfirst }}</dd></div>
+            <div><dt>Member since</dt><dd>{{ user.date_joined|date:"F Y" }}</dd></div>
+          </dl>
+        </section>
+
+        <div class="stack" style="--stack: 24px">
+          <section class="card card-pad">
+            <div class="card-head">
+              <h2 class="t-h3">Following</h2>
+              <a class="t-small strong" href="{% url 'following' %}">Following ({{ following_count }})</a>
+            </div>
+            {% if following_preview %}
+              <ul class="row-list">
+                {% for provider in following_preview %}
+                  <li class="row-list__item row-list__item--static">
+                    {% avatar provider 36 %}
+                    <span class="row-list__text"><a class="t-small ink strong" href="{% url 'provider_profile' provider.id %}">{{ provider|display_name }}</a><span class="t-cap">{{ provider.university|uni_short }} · {{ provider.note_count }} note{{ provider.note_count|pluralize }}</span></span>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="t-small muted">Follow providers to hear when they post new notes. <a href="{% url 'providers' %}">Browse providers</a></p>
+            {% endif %}
+          </section>
+
+          <section class="card card-pad">
+            <div class="card-head">
+              <h2 class="t-h3">Notifications</h2>
+              <a class="t-small strong" href="{% url 'notifications' %}">Open all{% if unread_notifications %} ({{ unread_notifications }} new){% endif %}</a>
+            </div>
+            {% if recent_notifications %}
+              <ul class="row-list">
+                {% for item in recent_notifications %}
+                  <li>
+                    <a class="row-list__item" href="{{ item.url }}">
+                      {% if item.actor %}{% avatar item.actor 32 %}{% endif %}
+                      <span class="row-list__text"><span class="t-small ink">{{ item.text }}</span><span class="t-cap">{{ item.created_at|naturaltime }}</span></span>
+                      {% if not item.is_read %}<span class="unread-dot" aria-label="Unread"></span>{% endif %}
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="t-small muted">Nothing yet.</p>
+            {% endif %}
+          </section>
+        </div>
+      </div>
+
+      {% if user.user_type == 'basic' and not user.is_superuser %}
+        {% if application.status == 'pending' %}
+          <section class="card card-pad notice-card">
+            {% icon "clock" %}<div><h2 class="t-h3">Your provider application is being reviewed</h2><p class="t-small">You sent it {{ application.submitted_at|naturaltime }}. You’ll see the result here.</p></div>
+          </section>
+        {% elif application.status == 'rejected' %}
+          <section class="card card-pad notice-card">
+            {% icon "info" %}<div><h2 class="t-h3">Your provider application wasn’t approved</h2>
+            {% if application.rejection_reason %}<p class="t-small">Reason: {{ application.rejection_reason }}</p>{% endif %}
+            <p class="t-small">{% if application.can_reapply %}<a href="{% url 'become_provider' %}">Apply again</a>{% else %}You can apply again on {{ application.can_reapply_at|date:"j F Y" }}.{% endif %}</p></div>
+          </section>
+        {% else %}
+          <section class="band-card">
+            <div><h2 class="t-h3">Share your own notes</h2><p class="t-small">Apply to become a provider. A moderator replies within a few days.</p></div>
+            <a class="btn btn-light" href="{% url 'become_provider' %}">Apply now</a>
+          </section>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</main>
+{% endblock %}

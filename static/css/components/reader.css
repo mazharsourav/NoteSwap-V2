@@ -1,0 +1,62 @@
+/*
+  File viewer: a toolbar (.viewer__bar) over the reader, which shows one or more files (PDFs and
+  photos) as pages fitted to the width (js/core/reader.js). Used inline on the note page and in
+  the file preview pop-up (js/pages/file-preview.js) on the NoteSolve pages.
+*/
+.viewer { overflow: hidden; }
+.viewer__bar { display: flex; align-items: center; gap: 8px; min-height: 57px; padding: 10px 12px 10px 18px; border-bottom: 1px solid var(--line); background: var(--white); }
+.viewer__name { display: inline-flex; align-items: center; gap: 8px; flex-grow: 1; min-width: 0; }
+.viewer__name strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.viewer__tools { display: flex; align-items: center; gap: 10px; }
+.viewer__pages { min-width: 4.5em; text-align: center; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.viewer__zoom { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 10px; }
+.viewer__zoom .btn { border-radius: 9px; }
+.viewer__fit { min-width: 64px; padding: 0 8px; font-variant-numeric: tabular-nums; }
+.viewer__stage { display: flex; justify-content: center; background: var(--surface); }
+.viewer.is-fullscreen { border-radius: 0; display: flex; flex-direction: column; }
+.viewer.is-fullscreen .viewer__stage { flex-grow: 1; min-height: 0; }
+
+/* Reader: the pages, drawn by js/core/reader.js */
+.reader { position: relative; width: 100%; height: min(78vh, 860px); overflow: auto; overflow-anchor: none; padding: 20px; outline: none; }
+.reader:focus-visible { box-shadow: inset 0 0 0 2px var(--green-500); }
+.viewer.is-fullscreen .reader { height: auto; }
+.viewer.is-failed .viewer__fullscreen, .viewer.is-failed [data-reader-tools] { display: none; }
+.reader__page {
+  position: relative;
+  margin: 0 auto 16px;
+  background: var(--white);
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(22, 33, 28, .05), 0 6px 20px rgba(22, 33, 28, .07);
+}
+.reader__page:last-child { margin-bottom: 0; }
+.reader__page canvas, .reader__page img { display: block; width: 100%; height: 100%; border-radius: inherit; }
+.reader__page img { object-fit: contain; }
+.reader__badge { position: absolute; top: 10px; left: 10px; z-index: 1; box-shadow: var(--shadow-float); }
+.reader__broken {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  height: 100%; padding: 20px; text-align: center; color: var(--muted); font-size: var(--fs-small);
+}
+.reader__status { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--muted); font-size: var(--fs-small); }
+
+/* Shown without JavaScript, or when the reader can't start (very old browser) */
+.reader-fallback { display: none; flex-direction: column; gap: 14px; width: 100%; padding: 24px; }
+html:not(.js) .reader, .viewer.is-failed .reader { display: none; }
+html:not(.js) .reader-fallback, .viewer.is-failed .reader-fallback { display: flex; }
+
+/* In the preview pop-up: as big as the window allows */
+.dialog--reader { width: min(1080px, calc(100vw - 32px)); height: calc(100vh - 48px); max-height: none; overflow: hidden; }
+.dialog--reader .viewer { display: flex; flex-direction: column; height: 100%; border: 0; border-radius: 0; box-shadow: none; }
+.dialog--reader .viewer__stage { flex: 1 1 auto; min-height: 0; }
+.dialog--reader .reader { height: auto; }
+.dialog--reader .viewer__close { margin-left: 2px; }
+@media (max-width: 700px) {
+  .viewer__bar { padding: 8px 8px 8px 12px; }
+  .viewer__name strong, .viewer__fullscreen span { display: none; }
+  .viewer__name { flex-grow: 0; }
+  .viewer__tools { flex-grow: 1; justify-content: center; gap: 6px; }
+  .viewer__fullscreen { width: 36px; padding: 0; }
+  /* Leave about a third of the screen outside the reader, so a swipe there still scrolls the page. */
+  .reader { height: 65vh; height: 65svh; padding: 10px; }
+  .reader__page { margin-bottom: 10px; }
+  .dialog--reader { width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; margin: 0; border: 0; border-radius: 0; }
+}

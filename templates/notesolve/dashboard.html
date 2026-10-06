@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% load static ui humanize custom_filters %}
+{% block title %}NoteSolve{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/components/reader.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/notesolve.css' %}">{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'js/pages/file-preview.js' %}"></script>
+<script src="{% static 'js/pages/notesolve.js' %}" defer></script>{% endblock %}
+
+{% block content %}
+<section class="browse-head solve-head">
+  <div class="wrap page-head__row">
+    <div class="page-head__text">
+      <span class="chip chip-deep">{% icon "crown" %}Premium</span>
+      <h1 class="t-h1">NoteSolve</h1>
+      <p class="muted">Stuck on a problem? Send it to a provider with a photo or PDF, and get a worked solution back here.</p>
+    </div>
+    <dl class="solve-stats">
+      <div><dt>waiting</dt><dd>{{ status_counts.pending }}</dd></div>
+      <div><dt>solved</dt><dd>{{ status_counts.solved }}</dd></div>
+    </dl>
+  </div>
+</section>
+
+<div class="wrap section solve-layout">
+  {# ---------- Ask (Premium only; after it ends, past requests stay readable) ---------- #}
+  {% if not can_ask %}
+  <section class="card card-pad solve-ask" id="ask" aria-labelledby="ask-title">
+    <h2 class="t-h2" id="ask-title">Your Premium has ended</h2>
+    <p class="t-small muted">{% if user.premium_until %}It ended on {{ user.premium_until|date:"j M Y" }}. {% endif %}You can still read and rate the answers you got. Renew Premium to ask new questions.</p>
+    <div class="form-actions"><a class="btn btn-primary" href="{% url 'premium_packages' %}">{% icon "crown" size="sm" %}Renew Premium</a></div>
+  </section>
+  {% else %}
+  {# On narrow screens a student with past requests sees those first; the form waits behind a button (js/pages/notesolve.js). #}
+  <section class="card card-pad solve-ask{% if my_requests and not form.errors and not file_form.errors and not selected_provider %} is-collapsible{% endif %}" id="ask" aria-labelledby="ask-title" data-solve-ask>
+    <div class="solve-ask__head">
+      <h2 class="t-h2" id="ask-title">Ask a question</h2>
+      <p class="t-small muted solve-ask__lead">Send a new problem to a provider and get a worked solution back.</p>
+      <button class="btn btn-primary solve-ask__open" type="button" aria-expanded="false" aria-controls="solve-form" data-solve-ask-open hidden>{% icon "plus" size="sm" %}Ask a new question</button>
+    </div>
+    <form method="post" enctype="multipart/form-data" class="solve-form" id="solve-form">
+      {% csrf_token %}
+      <div class="field">
+        <label class="label" for="provider-pick">Send to</label>
+        <select class="input" id="provider-pick" name="provider_id" required>
+          <option value="">Choose a provider</option>
+          {% if suggested_ids %}
+            <optgroup label="From your university and department">
+              {% for provider in providers %}{% if provider.id in suggested_ids %}<option value="{{ provider.id }}"{% if selected_provider == provider.id|stringformat:"s" %} selected{% endif %}>{{ provider|display_name }}{% if provider.avg_rating %} · ★ {{ provider.avg_rating|floatformat:1 }}{% endif %}</option>{% endif %}{% endfor %}
+            </optgroup>
+            <optgroup label="Other providers">
+          {% endif %}
+          {% for provider in providers %}{% if provider.id not in suggested_ids %}<option value="{{ provider.id }}"{% if selected_provider == provider.id|stringformat:"s" %} selected{% endif %}>{{ provider|display_name }}{% if provider.university %} ({{ provider.university|uni_short }}){% endif %}{% if provider.avg_rating %} · ★ {{ provider.avg_rating|floatformat:1 }}{% endif %}</option>{% endif %}{% endfor %}
+          {% if suggested_ids %}</optgroup>{% endif %}
+        </select>
+      </div>
+      <div class="field-row">
+        {% include "components/_field.html" with field=form.subject %}
+        {% include "components/_field.html" with field=form.topic %}
+      </div>
+      {% include "components/_field.html" with field=form.problem_description label="Your question" hint="Say which question, what you tried and where you got stuck." %}
+      <div class="field-row">
+        {% include "components/_field.html" with field=form.university %}
+        {% include "components/_field.html" with field=form.department %}
+      </div>
+      <div class="field-row field-row--3">
+        {% include "components/_field.html" with field=form.year %}
+        {% include "components/_field.html" with field=form.semester %}
+      </div>
+      {% include "components/_file_field.html" with field=file_form.file label="Photo or PDF of the problem" optional=True %}
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">{% icon "send" size="sm" %}Send question</button>
+      </div>
+    </form>
+  </section>
+  {% endif %}
+
+  {# ---------- Your requests ---------- #}
+  <section class="solve-requests" aria-labelledby="requests-title">
+    <h2 class="t-h3" id="requests-title">Your requests</h2>
+    {% if my_requests %}
+      <ul class="request-list">
+        {% for req in my_requests %}
+          {% with solved_item=solved|get_item:req.id files=request_files|get_item:req.id %}
+          <li>
+            <details class="card request-item request-item--{{ req.status }}"{% if forloop.first %} open{% endif %}>
+              <summary class="request-item__summary">
+                <span class="request-item__title"><span class="t-small ink strong">{{ req.subject }} · {{ req.topic }}</span><span class="t-cap">To {{ req.requested_to|display_name }} · {{ req.created_at|naturaltime }}</span></span>
+                {% if req.status == 'solved' %}<span class="chip chip-sm">{% icon "check" %}Solved</span>{% elif req.status == 'rejected' %}<span class="chip chip-line chip-sm">{% icon "x" %}Not taken</span>{% else %}<span class="chip chip-gray chip-sm">{% icon "clock" %}Waiting</span>{% endif %}
+                {% icon "chev-down" size="sm" cls="request-item__chev" %}
+              </summary>
+              <div class="request-item__body">
+                <p class="t-small">{{ req.problem_description|linebreaksbr|default:"No description." }}</p>
+                {% if files %}
+                  <div class="cluster">{% for f in files %}<a class="chip chip-line" href="{% url 'notesolve_file' f.id %}" target="_blank" rel="noopener" data-preview="{{ f.file.name|filename }}">{% icon "clip" %}{{ f.file.name|cut:"notesolve_files/"|truncatechars:28 }}</a>{% endfor %}</div>
+                {% endif %}
+
+                {% if solved_item %}
+                  <div class="solution">
+                    <div class="solution__head">{% avatar req.requested_to 28 %}<span class="t-small ink strong">{{ req.requested_to|display_name }}’s solution</span></div>
+                    {% if solved_item.solution_text %}<div class="t-small solution__text">{{ solved_item.solution_text|linebreaks }}</div>{% endif %}
+                    {% if solved_item.file %}
+                      <div class="cluster">
+                        <a class="btn btn-secondary btn-sm" href="{% url 'notesolve_solution_file' solved_item.id %}" target="_blank" rel="noopener" data-preview="{{ solved_item.file.name|filename }}">{% icon "eye" size="sm" %}View</a>
+                        <a class="btn btn-ghost btn-sm" href="{% url 'notesolve_solution_file' solved_item.id %}" download>{% icon "download" size="sm" %}Download</a>
+                      </div>
+                    {% endif %}
+                    {% if not solved_item.rating %}
+                      <form class="rate-form" method="post" data-autosubmit>
+                        {% csrf_token %}
+                        <input type="hidden" name="rate_solution_id" value="{{ solved_item.id }}">
+                        <fieldset>
+                          <legend class="label">Rate this solution</legend>
+                          <div class="rate">
+                            {% for value in "54321" %}
+                              <input class="visually-hidden" type="radio" name="rating" id="rate-{{ solved_item.id }}-{{ value }}" value="{{ value }}" required>
+                              <label for="rate-{{ solved_item.id }}-{{ value }}">{% icon "star" cls="star" %}<span class="visually-hidden">{{ value }} out of 5</span></label>
+                            {% endfor %}
+                          </div>
+                        </fieldset>
+                        <button class="btn btn-soft btn-sm rate-form__save" type="submit">Submit Rating</button>
+                      </form>
+                    {% else %}
+                      <p class="t-cap rated">You rated it {% stars solved_item.rating 14 %}</p>
+                    {% endif %}
+                  </div>
+                {% elif req.status == 'rejected' %}
+                  <div class="solution solution--rejected">
+                    <p class="t-small"><strong class="ink">{{ req.requested_to|display_name }} couldn’t take this one.</strong>{% if req.rejection_reason %} Reason: {{ req.rejection_reason }}{% endif %}</p>
+                    {% if can_ask %}
+                    <form class="resend-form" method="post" action="{% url 'resend_solve_request' req.id %}">
+                      {% csrf_token %}
+                      <label class="visually-hidden" for="resend-{{ req.id }}">Send it to another provider</label>
+                      <select class="input" id="resend-{{ req.id }}" name="provider_id" required>
+                        <option value="">Send to another provider…</option>
+                        {% for p in all_providers %}{% if p.id != req.requested_to_id %}<option value="{{ p.id }}">{{ p|display_name }}{% if p.university %} ({{ p.university|uni_short }}){% endif %}</option>{% endif %}{% endfor %}
+                      </select>
+                      <button class="btn btn-primary btn-sm" type="submit">Send</button>
+                    </form>
+                    {% endif %}
+                  </div>
+                {% else %}
+                  <p class="t-cap waiting">{% icon "clock" size="sm" %}Waiting for {{ req.requested_to.first_name|default:req.requested_to.username }} to answer.</p>
+                {% endif %}
+              </div>
+            </details>
+          </li>
+          {% endwith %}
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty"><span class="empty__icon">{% icon "message" %}</span><span class="empty__title">No questions yet</span><p>Your questions and their solutions show up here.</p></div>
+    {% endif %}
+  </section>
+</div>
+
+{# ---------- Providers ---------- #}
+{% if can_ask %}
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-head__text"><span class="eyebrow">Providers</span><h2 class="t-h2">Who you can ask</h2></div>
+      <form class="search solve-search" method="get" role="search">
+        {% icon "search" %}
+        <input class="input" type="search" name="q" value="{{ request.GET.q }}" placeholder="Search providers" aria-label="Search providers">
+      </form>
+    </div>
+    <div class="grid grid-providers solve-providers">
+      {% for provider in providers %}
+        <article class="card provider-card suggested-provider-card">
+          {% avatar provider 64 %}
+          <div class="provider-card__who">
+            <h3 class="t-h3"><a class="provider-card__name" href="{% url 'provider_profile' provider.id %}">{{ provider|display_name }}</a></h3>
+            <span class="t-small muted">{{ provider.university|uni_short }}{% if provider.department %} · {{ provider.department }}{% endif %}</span>
+          </div>
+          <div class="provider-card__stats">
+            {% if provider.avg_rating %}<span class="rating">{% icon "star" cls="star is-on" %}{{ provider.avg_rating|floatformat:1 }}<span class="rating__count">solution rating</span></span>{% else %}<span class="t-cap">Not rated yet</span>{% endif %}
+            {% if provider.id in suggested_ids %}<span class="chip chip-sm">Your department</span>{% endif %}
+          </div>
+          <a class="btn btn-secondary btn-sm" href="?provider={{ provider.id }}#ask">{% icon "send" size="sm" %}Ask<span class="solve-providers__name"> {{ provider.first_name|default:provider.username }}</span></a>
+        </article>
+      {% empty %}
+        <div class="empty"><span class="empty__icon">{% icon "users" %}</span><span class="empty__title">No providers found</span></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% include "components/_file_preview.html" %}
+{% endblock %}

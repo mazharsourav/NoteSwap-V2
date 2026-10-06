@@ -1,0 +1,48 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Something went wrong · NoteSwap</title>
+  <link rel="icon" href="{% static 'img/brand/mark.svg' %}" type="image/svg+xml">
+  <!-- Self-contained on purpose: shown when the server itself fails, so it relies on
+       no context, database or shared stylesheet. Colours match css/base/tokens.css. -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      display: grid; place-items: center;
+      padding: 24px;
+      background: #FFFFFF; color: #3F4B45;
+      font-family: "Nunito", ui-rounded, "Segoe UI", system-ui, -apple-system, sans-serif;
+      line-height: 1.6; text-align: center;
+    }
+    main { max-width: 480px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; color: #16211C; text-decoration: none;
+             font-size: 21px; font-weight: 900; letter-spacing: -0.03em; }
+    .brand span { color: #0B7D57; }
+    .mark { width: 34px; height: 34px; border-radius: 10px; background: #0EB582; display: inline-flex;
+            align-items: center; justify-content: center; }
+    .code { margin: 24px 0 0; font-size: 96px; line-height: 1; font-weight: 900; letter-spacing: -0.05em;
+            color: #DDF2E8; -webkit-text-stroke: 2px #0EB582; }
+    h1 { margin: 0; color: #16211C; font-size: 30px; line-height: 1.15; font-weight: 900; letter-spacing: -0.02em; }
+    p { margin: 0; color: #66726C; }
+    .btn { margin-top: 12px; display: inline-flex; align-items: center; height: 44px; padding: 0 20px;
+           border-radius: 10px; background: #0B7D57; color: #FFFFFF; font-weight: 800; text-decoration: none; }
+    .btn:hover { background: #08664A; }
+    .btn:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(14, 181, 130, .22); }
+  </style>
+</head>
+<body>
+  <main>
+    <a href="/" class="brand" aria-label="NoteSwap home">
+      <span class="mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4.5h6a4 4 0 0 1 4 4V21a3 3 0 0 0-3-3H2z"/><path d="M22 4.5h-6a4 4 0 0 0-4 4V21a3 3 0 0 1 3-3h7z"/></svg></span>
+      <span aria-hidden="true" style="color: #16211C">Note<span>Swap</span></span>
+    </a>
+    <p class="code" aria-hidden="true">500</p>
+    <h1>Something went wrong on our side</h1>
+    <p>Sorry about that. The problem has been logged. Please try again in a few minutes.</p>
+    <a href="/" class="btn">Go to home</a>
+  </main>
+</body>
+</html>

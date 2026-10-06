@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load ui humanize %}
+{% block title %}Become a provider{% endblock %}
+
+{% block content %}
+<div class="wrap wrap-form form-page">
+  <div class="form-page__head">
+    <span class="eyebrow">For providers</span>
+    <h1 class="t-h1">Become a provider</h1>
+    <p class="muted">Share your notes with the students a year or two behind you. After a moderator approves you, you can upload notes, build a following and answer NoteSolve questions.</p>
+  </div>
+
+  {% if state == 'accepted' %}
+    <div class="card form-card status-card">
+      <span class="status-card__icon">{% icon "check" size="lg" %}</span>
+      <h2 class="t-h2">You’re a provider</h2>
+      <p>Upload your first note. A moderator checks it, then your followers are notified.</p>
+      <div class="form-actions"><a class="btn btn-primary" href="{% url 'upload_note' %}">{% icon "upload" size="sm" %}Upload a note</a></div>
+    </div>
+
+  {% elif state == 'pending' %}
+    <div class="card form-card status-card">
+      <span class="status-card__icon">{% icon "clock" size="lg" %}</span>
+      <h2 class="t-h2">Your application is being reviewed</h2>
+      <p>You sent it {{ application.submitted_at|naturaltime }} ({{ application.submitted_at|date:"j F Y" }}). This page and your profile show the result as soon as a moderator decides.</p>
+    </div>
+
+  {% elif state == 'cooldown' %}
+    <div class="card form-card status-card">
+      <span class="status-card__icon">{% icon "info" size="lg" %}</span>
+      <h2 class="t-h2">Your application wasn’t approved</h2>
+      {% if application.rejection_reason %}<p><strong class="ink">Reason:</strong> {{ application.rejection_reason }}</p>{% endif %}
+      <p>You can apply again on <strong class="ink">{{ application.can_reapply_at|date:"j F Y" }}</strong>.</p>
+    </div>
+
+  {% else %}
+    {% if application and application.rejection_reason %}
+      <div class="notice notice-gray">{% icon "info" %}<div><strong>Your previous application wasn’t approved.</strong> Reason: {{ application.rejection_reason }} You’re welcome to apply again below.</div></div>
+    {% endif %}
+    <ol class="steps-row" aria-label="How it works">
+      <li><span>1</span>Fill in the form</li>
+      <li><span>2</span>A moderator reviews it</li>
+      <li><span>3</span>Start uploading</li>
+    </ol>
+    <form class="card form-card" method="post">
+      {% csrf_token %}
+      {% include "components/_form_errors.html" %}
+      <fieldset class="form-section">
+        <legend class="form-section__title">About you</legend>
+        <div class="field-row">
+          {% include "components/_field.html" with field=form.first_name %}
+          {% include "components/_field.html" with field=form.last_name %}
+        </div>
+        <div class="field-row">
+          {% include "components/_field.html" with field=form.email %}
+          {% include "components/_field.html" with field=form.phone_number %}
+        </div>
+        <div class="field-row field-row--3">
+          {% include "components/_field.html" with field=form.gender %}
+          {% include "components/_field.html" with field=form.nationality %}
+          {% include "components/_field.html" with field=form.profession %}
+        </div>
+        {% include "components/_field.html" with field=form.address %}
+      </fieldset>
+      <fieldset class="form-section">
+        <legend class="form-section__title">Your studies</legend>
+        <div class="field-row field-row--3">
+          {% include "components/_field.html" with field=form.university %}
+          {% include "components/_field.html" with field=form.department %}
+          {% include "components/_field.html" with field=form.cgpa label="CGPA" %}
+        </div>
+      </fieldset>
+      <p class="t-cap">Only moderators see these details. Your public provider page shows your name, university and department.</p>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Send application</button>
+        <a class="btn btn-ghost is-plain" href="{% url 'providers' %}">Cancel</a>
+      </div>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

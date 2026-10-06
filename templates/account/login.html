@@ -1,0 +1,46 @@
+{% extends "allauth/layouts/entrance.html" %}
+{% load ui %}
+{% block head_title %}Sign in{% endblock %}
+
+{% block content %}
+<div class="auth__head">
+  <h1 class="t-h1">Welcome back</h1>
+  <p class="muted">Sign in to open notes, rate them and follow providers.</p>
+</div>
+
+{% if google_login_enabled %}
+  {% include "account/_google_button.html" with label="Continue with Google" %}
+  <div class="auth__or"><span>or with your password</span></div>
+{% endif %}
+
+<form class="auth-form" method="post" action="{% url 'account_login' %}" id="login-form">
+  {% csrf_token %}
+  {{ redirect_field }}
+  {% for error in form.non_field_errors %}
+    <div class="form-alert login-error" role="alert">{% icon "alert" %}<p>{{ error }}</p></div>
+  {% endfor %}
+  <div class="field{% if form.login.errors %} has-error{% endif %}">
+    <label class="label" for="id_login">Username or email</label>
+    <input class="input" type="text" id="id_login" name="login" value="{{ form.login.value|default:'' }}"
+           placeholder="you@university.edu" autocomplete="username" required autofocus>
+    {% for error in form.login.errors %}<span class="field-error">{% icon "alert" %}{{ error }}</span>{% endfor %}
+  </div>
+  <div class="field{% if form.password.errors %} has-error{% endif %}">
+    <div class="field__label-row">
+      <label class="label" for="id_password">Password</label>
+      <a class="t-small strong" href="{% url 'account_reset_password' %}">Forgot password?</a>
+    </div>
+    <div class="password-field">
+      <input class="input" type="password" id="id_password" name="password" autocomplete="current-password" required>
+      <button class="password-field__toggle" type="button" data-password-toggle aria-label="Show password" aria-pressed="false">{% icon "eye" %}</button>
+    </div>
+    {% for error in form.password.errors %}<span class="field-error">{% icon "alert" %}{{ error }}</span>{% endfor %}
+  </div>
+  {% if form.remember %}
+    <label class="check"><input type="checkbox" id="id_remember" name="remember"{% if form.remember.value %} checked{% endif %}>Keep me signed in</label>
+  {% endif %}
+  <button class="btn btn-primary btn-lg btn-block" type="submit">Sign in</button>
+</form>
+
+<p class="auth__switch t-small muted">New to NoteSwap? <a class="strong" href="{% url 'account_signup' %}{% if redirect_field_value %}?next={{ redirect_field_value|urlencode }}{% endif %}">Create an account</a></p>
+{% endblock %}

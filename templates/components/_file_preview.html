@@ -1,0 +1,33 @@
+{% load static ui %}{% comment %}
+  File preview pop-up: links with data-preview="file name" open their file in the reader
+  (js/pages/file-preview.js, styles in components/reader.css) instead of the browser's own viewer.
+  Without JavaScript, or with Ctrl/⌘-click, the links simply open the file in a new tab.
+  Include once per page, with reader.css in {% block styles %} and file-preview.js in {% block scripts %}.
+{% endcomment %}
+<dialog class="dialog dialog--reader" id="file-preview" aria-label="File preview"></dialog>
+<template id="file-preview-viewer">
+  <div class="viewer" data-viewer>
+    <div class="viewer__bar">
+      <span class="viewer__name t-small ink">{% icon "file" size="sm" %}<strong data-reader-name></strong></span>
+      <div class="viewer__tools" data-reader-tools hidden>
+        <span class="viewer__pages t-small" aria-live="polite"><span class="visually-hidden">Page </span><span data-reader-page>1</span> / <span data-reader-pages>1</span></span>
+        <span class="viewer__zoom">
+          <button class="btn btn-ghost btn-sm btn-icon is-plain" type="button" data-reader-zoom="out" aria-label="Zoom out" title="Zoom out">{% icon "minus" size="sm" %}</button>
+          <button class="btn btn-ghost btn-sm is-plain viewer__fit" type="button" data-reader-zoom="fit" title="Fit to width">Fit</button>
+          <button class="btn btn-ghost btn-sm btn-icon is-plain" type="button" data-reader-zoom="in" aria-label="Zoom in" title="Zoom in">{% icon "plus" size="sm" %}</button>
+        </span>
+      </div>
+      <a class="btn btn-ghost btn-sm btn-icon is-plain" href="#" target="_blank" rel="noopener" data-reader-open aria-label="Open in a new tab" title="Open in a new tab">{% icon "external" size="sm" %}</a>
+      <a class="btn btn-ghost btn-sm btn-icon is-plain" href="#" download data-preview-download aria-label="Download" title="Download">{% icon "download" size="sm" %}</a>
+      <button class="btn btn-ghost btn-sm btn-icon is-plain viewer__close" type="button" data-dialog-close aria-label="Close" title="Close">{% icon "x" size="sm" %}</button>
+    </div>
+    <div class="viewer__stage">
+      <div class="reader" data-reader data-lib="{% static 'vendor/pdfjs/pdf.min.mjs' %}" data-worker="{% static 'vendor/pdfjs/pdf.worker.min.mjs' %}" tabindex="0" role="region" aria-label="File preview">
+        <p class="reader__status" data-reader-status>Opening the file…</p>
+      </div>
+      <div class="reader-fallback">
+        <p class="t-small">This file can’t be shown here. Open it in a new tab or download it with the buttons above.</p>
+      </div>
+    </div>
+  </div>
+</template>

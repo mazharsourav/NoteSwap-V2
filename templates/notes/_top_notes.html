@@ -1,0 +1,19 @@
+{% load ui %}{% comment %}Sidebar list of notes (e.g. the newest in a subject). Expects: top_notes, title. plain=True drops the 1, 2, 3 numbers (for lists that are not a ranking).{% endcomment %}
+{% if top_notes %}
+<div class="card side-card">
+  <h2 class="side-card__title">{{ title }}</h2>
+  <ol class="top-list">
+    {% for note in top_notes %}
+      <li>
+        <a href="{% url 'note_detail' note.id %}">
+          {% if not plain %}<span class="top-list__num">{{ forloop.counter }}</span>{% endif %}
+          <span class="top-list__text">
+            <span class="top-list__name">{{ note.name }}</span>
+            <span class="t-cap">{{ note.provider|display_name }}{% if note.rating_count %} · ★ {{ note.avg_rating|floatformat:1 }}{% endif %}</span>
+          </span>
+        </a>
+      </li>
+    {% endfor %}
+  </ol>
+</div>
+{% endif %}

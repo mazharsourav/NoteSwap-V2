@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}About{% endblock %}
+{% block meta_description %}NoteSwap is built by students, for students: one place for good notes from people who already took the course.{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/pages.css' %}">{% endblock %}
+
+{% block content %}
+<section class="about-hero">
+  <div class="wrap">
+    <div class="about-hero__inner" data-reveal>
+      <span class="eyebrow">About NoteSwap</span>
+      <h1 class="t-display">Good notes shouldn’t depend on who you know.</h1>
+      <p class="t-lead">NoteSwap is one place where students share the notes that got them through a course, checked by moderators and organised by course.</p>
+    </div>
+  </div>
+</section>
+
+<div class="wrap section about-story">
+  <article class="prose">
+    <h2>Our story</h2>
+    <p>In every university library before exams, students ask the same question: “Where can I find good notes?” NoteSwap started with a few of us in the middle of our finals, digging through blurry photos in group chats and outdated PDFs, while classmates down the hall had written brilliant notes with nowhere to share them.</p>
+    <p>So we asked: why should good study material depend on luck, or on how many WhatsApp and Messenger groups you’re in?</p>
+    <p>We taught ourselves web development between classes and part-time jobs, and tested NoteSwap at our own university. At first only a handful of people uploaded. There were bugs and complaints, but also the first moments where a second-year student opened a senior’s notes from another department, instantly and for free.</p>
+    <p>We kept listening. We added moderator checks so every note can be trusted, ratings so the best rise to the top, following so you hear when your favourite provider posts, and NoteSolve for the problems you’re stuck on.</p>
+    <p>NoteSwap is still growing, but the idea hasn’t changed: built by students, for students, to make studying easier and shared.</p>
+  </article>
+
+  <aside class="about-values" data-reveal-stagger>
+    <div class="card value-card"><span class="subject-card__icon">{% icon "shield" %}</span><h3 class="t-h3">Checked, not dumped</h3><p class="t-small muted">Moderators review every note before anyone sees it.</p></div>
+    <div class="card value-card"><span class="subject-card__icon">{% icon "users" %}</span><h3 class="t-h3">From students a year ahead</h3><p class="t-small muted">Providers are students who already took the course.</p></div>
+    <div class="card value-card"><span class="subject-card__icon">{% icon "book" %}</span><h3 class="t-h3">Free to read</h3><p class="t-small muted">Reading and downloading notes is free for every student.</p></div>
+  </aside>
+</div>
+
+<section class="section-band about-team">
+  <div class="wrap">
+    <div class="about-team__head">
+      <span class="eyebrow">The team</span>
+      <h2 class="t-h2">The people building NoteSwap</h2>
+      <p class="t-small muted">Students who build it between classes. Say hi.</p>
+    </div>
+    <div class="team-grid" data-reveal-stagger>
+      {% for member in team %}
+        <article class="card team-card team-card--{% cycle 'a' 'b' %}">
+          <div class="team-card__cover" aria-hidden="true"></div>
+          <img class="team-card__photo" src="{% static member.photo %}" alt="" width="104" height="104" loading="lazy">
+          <h3 class="team-card__name">{{ member.name }}</h3>
+          <p class="team-card__role">{{ member.role }}</p>
+          <p class="team-card__bio">{{ member.bio }}</p>
+          {% if member.facts %}
+            <dl class="team-card__facts">
+              {% for label, value in member.facts %}<div><dt>{{ label }}</dt><dd>{{ value }}</dd></div>{% endfor %}
+            </dl>
+          {% endif %}
+          {% if member.link_list %}
+            <ul class="team-card__links">
+              {% for link in member.link_list %}
+                <li><a class="team-link" href="{{ link.url }}"{% if link.icon != 'mail' %} target="_blank" rel="noopener"{% endif %} title="{{ link.label }}" aria-label="{{ member.name }} on {{ link.label }}">{% icon link.icon size="sm" %}</a></li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="band" data-reveal>
+      <div class="band__text">
+        <h2 class="t-h2">Start with your subject.</h2>
+        <p>Browse is free; sign in to open a note.</p>
+      </div>
+      <a class="btn btn-light btn-lg" href="{% url 'subject_list' %}">Browse notes</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

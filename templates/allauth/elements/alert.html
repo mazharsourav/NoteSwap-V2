@@ -1,0 +1,1 @@
+{% load allauth ui %}<div class="notice{% if 'warning' in attrs.tags or 'error' in attrs.tags %} notice-gray{% endif %}" role="status">{% icon "info" %}<div>{% slot message %}{% endslot %}</div></div>

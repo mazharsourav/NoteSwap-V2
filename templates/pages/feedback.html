@@ -1,0 +1,12 @@
+{% extends "pages/_message_form.html" %}
+{% load ui %}
+{% block title %}Send feedback{% endblock %}
+{% block eyebrow %}Feedback{% endblock %}
+{% block heading %}Tell us what you think{% endblock %}
+{% block intro %}What do you like, what’s missing, what gets in your way? Every message is read by the team.{% endblock %}
+{% block aside %}
+  <li>{% icon "edit" %}<span><strong>Be specific</strong> Which page, what you expected and what happened.</span></li>
+  <li>{% icon "message" %}<span><strong>Need an answer?</strong> <a href="{% url 'ask_question' %}">Ask a question</a> instead and we’ll reply.</span></li>
+{% endblock %}
+{% block message_field %}{% include "components/_field.html" with field=form.message label="Your feedback" %}{% endblock %}
+{% block submit %}Send{% endblock %}

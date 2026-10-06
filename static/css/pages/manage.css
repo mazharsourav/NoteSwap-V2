@@ -1,0 +1,141 @@
+/* Manage area (dashboard/_layout.html): overview, review queue, applications, inbox, Premium. */
+
+.manage { background: var(--surface); padding-block: clamp(24px, 4vw, 40px) var(--section-gap); }
+.manage-layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 32px; align-items: start; }
+.manage-content { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+
+.manage-nav { padding: 10px; position: sticky; top: calc(var(--header-h) + 24px); }
+.manage-nav__label { padding: 8px 12px 6px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.manage-nav__sep { height: 1px; margin: 8px 4px; background: var(--line); }
+
+@media (max-width: 960px) {
+  .manage-layout { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  /* Phones: the sidebar becomes a dropdown showing the current page (navigation.css). */
+  .manage-nav { position: static; padding: 6px; }
+  .js .manage-nav .side-menu__toggle { display: flex; }
+  .js .manage-nav:not(.is-open) .side-menu__list { display: none; }
+  .manage-nav__label { display: none; }
+}
+
+.manage-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px 24px; flex-wrap: wrap; }
+.manage-head > div { display: flex; flex-direction: column; gap: 6px; max-width: 680px; }
+.manage-head .t-h1 { font-size: clamp(1.625rem, 1.4rem + 1vw, 1.875rem); }
+
+/* Stat cards */
+.stat-grid { display: grid; gap: clamp(12px, 2vw, 20px); grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)); }
+.stat-card { display: flex; flex-direction: column; gap: 14px; padding: 22px; }
+.stat-card .link-arrow { margin-top: auto; }
+/* Phones: two across; an odd last card takes the whole row instead of leaving a gap */
+@media (max-width: 640px) {
+  .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat-grid > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+/* Icon above the label, so the label has the card's full width and doesn't wrap */
+.stat-card__top { display: flex; flex-direction: column-reverse; align-items: flex-start; gap: 12px; font-size: var(--fs-small); font-weight: 800; color: var(--text); }
+.stat-card__icon {
+  width: 36px; height: 36px; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--r-md); background: var(--green-50); color: var(--green-700);
+}
+.stat-card__num { font-size: 36px; line-height: 1; font-weight: 900; letter-spacing: -0.03em; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* Table cards */
+.table-card { overflow: hidden; }
+.table-card__head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 18px 20px; }
+.table-card__head .count { vertical-align: 2px; margin-left: 4px; }
+/* "Reject selected…" in a table head opens its reason box as a floating panel, not inline */
+.table-card__head .reject-box { position: relative; }
+.table-card__head .reject-box__form { position: absolute; right: 0; top: calc(100% + 8px); z-index: 20; margin-top: 0; box-shadow: var(--shadow-float); }
+.table-card__empty { padding: 0 16px 16px; }
+.table-card__empty .empty { border: 0; }
+.table-scroll { overflow-x: auto; }
+.table { width: 100%; text-align: left; }
+.table th {
+  padding: 10px 20px;
+  background: #F9FBFA;
+  font-size: var(--fs-cap); font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--muted);
+  white-space: nowrap;
+}
+.table td { padding: 14px 20px; border-top: 1px solid var(--line); vertical-align: middle; }
+.table tbody tr { transition: background-color var(--t-fast) var(--ease); }
+.table tbody tr:hover { background: #F9FBFA; }
+.table tbody tr.is-selected { background: var(--green-50); }
+.table .is-right { text-align: right; white-space: nowrap; }
+.table-check { width: 44px; padding-right: 0 !important; }
+.table-check input { width: 18px; height: 18px; margin: 0; accent-color: var(--green-700); vertical-align: middle; }
+
+.table-note { display: flex; gap: 12px; align-items: center; cursor: pointer; }
+.table-note__doc { width: 34px; height: 44px; flex: none; }
+.table-note__text { display: flex; flex-direction: column; min-width: 0; }
+.table-person { display: inline-flex; align-items: center; gap: 8px; font-size: var(--fs-small); font-weight: 700; color: var(--text); white-space: nowrap; }
+a.table-person:hover { color: var(--green-700); }
+.table-actions { display: flex; gap: 6px; justify-content: flex-end; align-items: center; flex-wrap: wrap; }
+.table-actions form { display: contents; }
+.table-check__all { display: none; }
+
+/* On phones, a .table--stack table shows each row as a small card instead of scrolling sideways.
+   Every cell is full width unless marked: .stack-start (left half) and .stack-end (right half, right-aligned)
+   share a line. data-label="Sent" puts a small label in front of a cell whose meaning needs the column head.
+   A .table-check checkbox sits in the card's top-left corner; "Select all" stays above the cards. */
+@media (max-width: 640px) {
+  .table--stack, .table--stack thead, .table--stack tbody, .table--stack td { display: block; }
+  .table--stack thead tr { display: flex; padding: 10px 16px; background: #F9FBFA; }
+  .table--stack thead th { display: none; }
+  .table--stack thead th.table-check { display: flex; align-items: center; gap: 10px; width: auto; padding: 0; }
+  .table--stack thead:not(:has(.table-check)) { display: none; }
+  .table-check__all { display: inline; font-size: var(--fs-small); font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--text); cursor: pointer; }
+  .table--stack tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-auto-flow: row dense; gap: 6px 12px; padding: 14px 16px; border-top: 1px solid var(--line); }
+  .table--stack td { grid-column: 1 / -1; min-width: 0; padding: 0; border: 0; text-align: left; white-space: normal; }
+  .table--stack td.stack-start { grid-column: 1; }
+  .table--stack td.stack-end { grid-column: 2; text-align: right; }
+  .table--stack td[data-label]::before { content: attr(data-label) " "; color: var(--muted); font-weight: 700; }
+  .table--stack td.stack-end[data-label]::before { content: none; }
+  .table--stack tr:has(td.table-check) { grid-template-columns: 22px minmax(0, 1fr) auto; column-gap: 12px; }
+  .table--stack tr:has(td.table-check) td { grid-column: 2 / -1; }
+  .table--stack tr:has(td.table-check) td.stack-start { grid-column: 2; }
+  .table--stack tr:has(td.table-check) td.stack-end { grid-column: 3; }
+  .table--stack td.table-check { grid-column: 1 !important; grid-row: 1; width: auto; padding-top: 2px !important; }
+  .table--stack td.stack-hide { display: none; }
+  .table--stack td.is-right { text-align: left; margin-left: -10px; }
+  .table--stack .table-person { white-space: normal; }
+  .table--stack .table-actions { justify-content: flex-start; padding-top: 6px; }
+}
+
+/* Provider applications */
+.application-list { display: flex; flex-direction: column; gap: 16px; }
+.application-card { display: flex; flex-direction: column; gap: 18px; padding: 22px 24px; }
+.application-card__who { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.application-card__who > div { flex: 1 1 200px; display: flex; flex-direction: column; gap: 2px; }
+.application-card__facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px 20px; margin: 0; padding: 16px 0; border-block: 1px solid var(--line); }
+.application-card__facts div { display: flex; flex-direction: column; gap: 2px; }
+.application-card__facts dt { font-size: var(--fs-cap); color: var(--muted); font-weight: 700; }
+.application-card__facts dd { margin: 0; font-weight: 700; color: var(--ink); }
+.application-actions { display: flex; gap: 8px; align-items: flex-start; flex-wrap: wrap; }
+.reject-box summary { list-style: none; }
+.reject-box summary::-webkit-details-marker { display: none; }
+.reject-box[open] summary { background: var(--surface); }
+.reject-box__form { display: flex; flex-direction: column; gap: 8px; width: min(420px, 80vw); margin-top: 10px; padding: 14px; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--white); animation: pop-in var(--t-fast) var(--ease); }
+.reject-box__form .btn { align-self: flex-start; }
+.application-detail { display: flex; flex-direction: column; gap: 22px; }
+
+/* Inbox */
+.inbox-filters { display: flex; flex-direction: column; gap: 14px; }
+.inbox-list { display: flex; flex-direction: column; gap: 14px; }
+.inbox-message { display: flex; flex-direction: column; gap: 12px; padding: 20px 22px; }
+.inbox-message.is-resolved { opacity: .72; }
+.inbox-message__head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.inbox-message__time { margin-left: auto; }
+.inbox-message__body { color: var(--ink); overflow-wrap: anywhere; }
+.inbox-message__body p + p { margin-top: 8px; }
+.inbox-message__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.inbox-message__actions form { display: contents; }
+
+/* Premium packages (admin view) and package form */
+.package-admin { display: flex; flex-direction: column; gap: 10px; }
+.package-admin__head { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; }
+.package-admin__head h3 { margin-right: auto; }
+.package-admin.is-off-sale { background: var(--surface); }
+.package-admin.is-off-sale .package-admin__price { color: var(--muted); }
+.package-admin__price { font-size: 28px; font-weight: 900; letter-spacing: -0.02em; color: var(--ink); }
+.package-admin .table-actions { justify-content: flex-start; margin-top: auto; padding-top: 8px; }
+.manage-form { max-width: 640px; }

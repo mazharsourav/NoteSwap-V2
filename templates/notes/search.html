@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}{% if q %}“{{ q }}” · Search{% else %}Search{% endif %}{% endblock %}
+{% block meta_description %}Search NoteSwap for subjects, notes and providers.{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/notes.css' %}">{% endblock %}
+
+{% block content %}
+<section class="search-hero">
+  <div class="wrap stack" style="--stack: 20px">
+    <h1 class="t-h1">{% if q %}Results for “{{ q }}”{% else %}Search notes{% endif %}</h1>
+    <form method="get" role="search" action="{% url 'search' %}">
+      <div class="search">
+        {% icon "search" %}
+        <input class="input" type="search" name="q" value="{{ q }}" placeholder="Search a course, course code, note or provider" aria-label="Search" maxlength="100"{% if not q %} autofocus{% endif %}>
+      </div>
+      <button class="btn btn-primary btn-lg" type="submit">Search</button>
+    </form>
+  </div>
+</section>
+
+<div class="wrap section" style="padding-top: 40px">
+  {% if not q %}
+    <div class="empty">
+      <span class="empty__icon">{% icon "search" %}</span>
+      <span class="empty__title">What are you looking for?</span>
+      <p>Search by course (“Physics”), course code (“CSE 301”), a note’s title (“Optics”), a university, or a provider’s name.</p>
+      <a class="btn btn-secondary btn-sm" href="{% url 'subject_list' %}">Browse all subjects</a>
+    </div>
+  {% elif not subjects and not providers and not page.object_list %}
+    <div class="empty">
+      <span class="empty__icon">{% icon "search" %}</span>
+      <span class="empty__title">Nothing found for “{{ q }}”</span>
+      <p>Check the spelling, try a shorter word, or browse by subject.</p>
+      <a class="btn btn-secondary btn-sm" href="{% url 'subject_list' %}">Browse all subjects</a>
+    </div>
+  {% else %}
+
+    {% if page.object_list %}
+      <section class="search-group">
+        <div class="search-group__head"><h2 class="t-h3">Notes</h2><span class="count">{{ page.paginator.count }}</span></div>
+        <div class="card list-card">
+          <ul class="note-rows">{% for note in page %}{% include "notes/_note_row.html" with show_subject=True %}{% endfor %}</ul>
+        </div>
+        {% include "components/_pagination.html" %}
+      </section>
+    {% endif %}
+
+    {% if page.number == 1 %}
+      {% if subjects %}
+        <section class="search-group">
+          <div class="search-group__head"><h2 class="t-h3">Courses</h2><span class="count">{{ subjects|length }}</span></div>
+          <div class="mini-list">
+            {% for subject in subjects %}
+              <a class="card lift mini-card" href="{% url 'subject_detail' subject.id %}">
+                <span class="subject-card__icon">{% icon "book" %}</span>
+                <span class="mini-card__text"><span class="t-small ink strong">{{ subject.name }}</span><span class="t-cap">{{ subject.note_count }} note{{ subject.note_count|pluralize }}</span></span>
+              </a>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
+
+      {% if providers %}
+        <section class="search-group">
+          <div class="search-group__head"><h2 class="t-h3">Providers</h2><span class="count">{{ providers|length }}</span></div>
+          <div class="mini-list">
+            {% for provider in providers %}
+              <a class="card lift mini-card" href="{% url 'provider_profile' provider.id %}">
+                {% avatar provider 40 %}
+                <span class="mini-card__text"><span class="t-small ink strong">{{ provider|display_name }}</span><span class="t-cap">{{ provider.university|uni_short|default:"Provider" }}</span></span>
+              </a>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "dashboard/_layout.html" %}
+{% load ui humanize %}
+{% block title %}Manage{% endblock %}
+
+{% block manage %}
+<div class="manage-head">
+  <div>
+    <h1 class="t-h1">Overview</h1>
+    {% with total=counts.pending_notes|add:counts.pending_files %}
+      <p class="muted">{% if total %}{{ total }} item{{ total|pluralize }} waiting for review{% if oldest_waiting %}. Oldest: {{ oldest_waiting|naturaltime }}{% endif %}.{% else %}Nothing is waiting for review. You’re all caught up.{% endif %}</p>
+    {% endwith %}
+  </div>
+  <a class="btn btn-secondary" href="{% url 'home' %}">{% icon "external" size="sm" %}View site</a>
+</div>
+
+<div class="stat-grid" data-reveal-stagger>
+  <a class="card lift stat-card" href="{% url 'verify_notes' %}">
+    <span class="stat-card__top"><span>Notes to review</span><span class="stat-card__icon">{% icon "file" size="sm" %}</span></span>
+    <span class="stat-card__num">{{ counts.pending_notes }}</span>
+    <span class="link-arrow">Review{% icon "arrow" size="sm" %}</span>
+  </a>
+  <a class="card lift stat-card" href="{% url 'verify_notes' %}#files">
+    <span class="stat-card__top"><span>Files to review</span><span class="stat-card__icon">{% icon "clip" size="sm" %}</span></span>
+    <span class="stat-card__num">{{ counts.pending_files }}</span>
+    <span class="link-arrow">Review{% icon "arrow" size="sm" %}</span>
+  </a>
+  <a class="card lift stat-card" href="{% url 'provider_requests' %}">
+    <span class="stat-card__top"><span>Applications</span><span class="stat-card__icon">{% icon "users" size="sm" %}</span></span>
+    <span class="stat-card__num">{{ counts.pending_applications }}</span>
+    <span class="link-arrow">Review{% icon "arrow" size="sm" %}</span>
+  </a>
+  <a class="card lift stat-card" href="{% url 'inbox' %}">
+    <span class="stat-card__top"><span>Open messages</span><span class="stat-card__icon">{% icon "inbox" size="sm" %}</span></span>
+    <span class="stat-card__num">{{ counts.open_messages }}</span>
+    <span class="link-arrow">Read{% icon "arrow" size="sm" %}</span>
+  </a>
+  {% if user.is_superuser %}
+    <a class="card lift stat-card" href="{% url 'manage_premium' %}">
+      <span class="stat-card__top"><span>Premium orders</span><span class="stat-card__icon">{% icon "crown" size="sm" %}</span></span>
+      <span class="stat-card__num">{{ counts.pending_purchases }}</span>
+      <span class="link-arrow">Review{% icon "arrow" size="sm" %}</span>
+    </a>
+  {% endif %}
+</div>
+
+<section class="card table-card">
+  <div class="table-card__head">
+    <h2 class="t-h3">Waiting for review</h2>
+    <a class="btn btn-ghost btn-sm" href="{% url 'verify_notes' %}">See all{% icon "arrow" size="sm" cls="icon-arrow" %}</a>
+  </div>
+  {% if waiting_notes %}
+    <div class="table-scroll">
+      <table class="table table--stack">
+        <thead><tr><th>Note</th><th>Provider</th><th>Course</th><th>Sent</th><th class="is-right">Actions</th></tr></thead>
+        <tbody>
+          {% for note in waiting_notes %}
+            <tr>
+              <td>
+                <div class="table-note">
+                  {% include "components/_note_cover.html" with size="sm" cls="table-note__doc" %}
+                  <span class="table-note__text"><span class="t-small ink strong">{{ note.name }}</span><span class="t-cap">New note · {{ note.get_note_type_display }}</span></span>
+                </div>
+              </td>
+              <td class="stack-start"><span class="table-person">{% avatar note.provider 26 %}{{ note.provider|display_name }}</span></td>
+              <td class="t-small">{{ note.subject.name }} · {{ note.university|uni_short }}</td>
+              <td class="t-small muted stack-end">{{ note.uploaded_at|naturaltime }}</td>
+              <td>
+                <form class="table-actions" method="post" action="{% url 'verify_notes' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="verify_type" value="main">
+                  <input type="hidden" name="note_ids" value="{{ note.id }}">
+                  <a class="btn btn-ghost btn-sm btn-icon is-plain" href="{% url 'note_detail' note.id %}" aria-label="Preview {{ note.name }}" title="Preview">{% icon "eye" size="sm" %}</a>
+                  <button class="btn btn-secondary btn-sm" type="submit" name="action" value="reject" data-confirm="Reject and remove “{{ note.name }}”?">Reject</button>
+                  <button class="btn btn-primary btn-sm" type="submit" name="action" value="verify">Approve</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="table-card__empty"><div class="empty"><span class="empty__icon">{% icon "check" %}</span><span class="empty__title">All caught up</span><p>New notes from providers show up here.</p></div></div>
+  {% endif %}
+</section>
+{% endblock %}

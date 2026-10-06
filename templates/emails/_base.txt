@@ -1,0 +1,7 @@
+{% autoescape off %}Hi {{ user.first_name|default:user.username }},
+
+{% block content %}{% endblock %}
+
+The NoteSwap team
+{{ site_url }}
+{% endautoescape %}

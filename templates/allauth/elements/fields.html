@@ -1,0 +1,2 @@
+{% load ui %}{% if attrs.form.non_field_errors %}<div class="form-alert" role="alert">{% icon "alert" %}<div>{% for error in attrs.form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div></div>{% endif %}
+{% for field in attrs.form %}{% if field.is_hidden %}{{ field }}{% else %}{% include "components/_field.html" with field=field %}{% endif %}{% endfor %}

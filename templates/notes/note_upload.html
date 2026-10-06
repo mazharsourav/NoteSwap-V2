@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}Upload a note{% endblock %}
+{% block scripts %}<script src="{% static 'js/pages/note-form.js' %}" defer></script>{% endblock %}
+
+{% block content %}
+<div class="wrap wrap-form form-page">
+  <div class="form-page__head">
+    <h1 class="t-h1">Upload a note</h1>
+    <p class="muted">A moderator checks every note before it goes live. Once it's approved, everyone who follows you is notified.</p>
+  </div>
+  <form class="card form-card" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% include "notes/_note_form.html" %}
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">{% icon "upload" size="sm" %}Upload for review</button>
+      <a class="btn btn-ghost is-plain" href="{% url 'subject_list' %}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% include "notes/_place_dialogs.html" %}
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}Edit profile{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/account.css' %}">{% endblock %}
+
+{% block main %}
+<main id="main" class="account-page">
+  <div class="wrap account-layout">
+    {% include "account/_settings_nav.html" %}
+    <div class="account-content">
+      <form class="card card-pad settings-card" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="settings-card__head">
+          <h1 class="t-h2">Edit profile</h1>
+          <p class="t-small muted">Your name, university and photo show on your comments, reviews and (for providers) your public page. To change your email, use <a href="{% url 'account_email' %}">Email addresses</a>.</p>
+        </div>
+        {% include "components/_form_errors.html" %}
+
+        <div class="photo-field">
+          {% avatar user 72 %}
+          <div class="field{% if form.profile_picture.errors %} has-error{% endif %}">
+            <label class="label" for="{{ form.profile_picture.id_for_label }}">Profile photo <span class="optional">(optional)</span></label>
+            <input type="file" name="{{ form.profile_picture.html_name }}" id="{{ form.profile_picture.id_for_label }}" accept=".jpg,.jpeg,.png,.webp">
+            {% if user.profile_picture %}<label class="check"><input type="checkbox" name="{{ form.profile_picture.html_name }}-clear" id="{{ form.profile_picture.id_for_label }}-clear">Remove the current photo</label>{% endif %}
+            <span class="hint">JPG, PNG or WEBP, up to 10 MB. A square photo works best.</span>
+            {% for error in form.profile_picture.errors %}<span class="field-error">{% icon "alert" %}{{ error }}</span>{% endfor %}
+          </div>
+        </div>
+
+        <div class="field-row">
+          {% include "components/_field.html" with field=form.first_name %}
+          {% include "components/_field.html" with field=form.last_name %}
+        </div>
+        <div class="field-row">
+          {% include "components/_field.html" with field=form.university %}
+          {% include "components/_field.html" with field=form.department %}
+        </div>
+        <div class="field-row field-row--3">
+          {% include "components/_field.html" with field=form.gender %}
+          {% include "components/_field.html" with field=form.age %}
+          {% include "components/_field.html" with field=form.city %}
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">Save changes</button>
+          <a class="btn btn-ghost is-plain" href="{% url 'profile' %}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+{% endblock %}

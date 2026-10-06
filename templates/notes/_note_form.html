@@ -1,0 +1,42 @@
+{% load ui %}{% comment %}
+  Fields shared by the upload and edit forms. Expects what views.notes._subject_picker() returns, and form;
+  editing=True on the edit page. Include notes/_place_dialogs.html after the <form> (the "Add a course" pop-up,
+  js/pages/note-form.js). A course is only a name; university, code, year and semester belong to the note.
+{% endcomment %}
+{% include "components/_form_errors.html" %}
+
+<fieldset class="form-section">
+  <legend class="form-section__title">About the note</legend>
+  {% include "components/_field.html" with field=form.name label="Title" hint="Say what's inside, e.g. “Wave optics: interference and diffraction”." %}
+  {% include "components/_field.html" with field=form.caption label="Description" hint="A sentence or two: what it covers, exam tips, how it's organised." %}
+</fieldset>
+
+<fieldset class="form-section">
+  <legend class="form-section__title">File</legend>
+  {% if editing %}
+    {% include "components/_file_field.html" with field=form.file label="Replace the file" optional=True current=note.file.name|cut:"notes/" hint="Leave empty to keep it. A new file is checked by a moderator again before the note shows." %}
+  {% else %}
+    {% include "components/_file_field.html" with field=form.file label="Note file" %}
+  {% endif %}
+</fieldset>
+
+<fieldset class="form-section">
+  <legend class="form-section__title">Course</legend>
+  <div class="field{% if form.subject.errors %} has-error{% endif %}">
+    <label class="label" for="{{ form.subject.id_for_label }}">Course</label>
+    <select class="input" id="{{ form.subject.id_for_label }}" name="{{ form.subject.html_name }}" required data-subject-picker{% if form.subject.errors %} aria-invalid="true"{% endif %}>
+      <option value="">Choose a course</option>
+      {% for subject in subjects %}<option value="{{ subject.id }}"{% if subject.id|stringformat:"s" == form.subject.value|stringformat:"s" %} selected{% endif %}>{{ subject.name }}</option>{% endfor %}
+    </select>
+    <span class="hint">The course name only, like “Data Communication”. Not in the list? Add it.</span>
+    {% if user.user_type == 'provider' or user.is_superuser %}
+      <a class="hint-link" href="{% url 'add_subject' %}?next={{ request.path|urlencode }}" data-dialog-open="add-subject-dialog">{% icon "plus" size="sm" %}Add a course</a>
+    {% endif %}
+    {% for error in form.subject.errors %}<span class="field-error">{% icon "alert" %}{{ error }}</span>{% endfor %}
+  </div>
+  {% include "components/_field.html" with field=form.university hint="Where this course was taught. Starts as the university on your profile." %}
+  <div class="field-row">
+    {% include "components/_field.html" with field=form.term %}
+    {% include "components/_field.html" with field=form.course_code label="Course code" hint="As your university writes it." %}
+  </div>
+</fieldset>

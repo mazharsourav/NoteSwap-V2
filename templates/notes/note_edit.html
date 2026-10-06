@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}Edit “{{ note.name }}”{% endblock %}
+{% block scripts %}<script src="{% static 'js/pages/note-form.js' %}" defer></script>{% endblock %}
+
+{% block content %}
+<div class="wrap wrap-form form-page">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="{% url 'note_detail' note.id %}">{{ note.name|truncatechars:50 }}</a>{% icon "chev-right" %}<span aria-current="page">Edit</span>
+  </nav>
+  <div class="form-page__head">
+    <h1 class="t-h1">Edit note</h1>
+    {% if note.is_rejected %}
+      <p class="muted">This note wasn’t approved{% if note.rejection_reason %}: “{{ note.rejection_reason }}”{% endif %}. Saving your changes sends it for review again.</p>
+    {% else %}
+      <p class="muted">Changes to the title, description or details show right away. Only a new file sends the note back for review.</p>
+    {% endif %}
+  </div>
+  <form class="card form-card" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% include "notes/_note_form.html" with editing=True %}
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">Save changes</button>
+      <a class="btn btn-ghost is-plain" href="{% url 'note_detail' note.id %}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% include "notes/_place_dialogs.html" %}
+{% endblock %}

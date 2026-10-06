@@ -1,0 +1,63 @@
+# Environment & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+client_secret*.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+# Django local data (dev database, uploads, collected static files)
+db.sqlite3
+db.sqlite3-journal
+*.sqlite3
+*.sqlite3-journal
+/media/
+/demo_media/
+/staticfiles/
+# Compiled translations are built on the server with `compilemessages`
+*.mo
+
+# Log files (DJANGO_LOG_FILE / DJANGO_AUDIT_LOG_FILE)
+logs/
+*.log
+
+# Test output
+tests/e2e/screenshots/
+chromedriver*
+geckodriver*
+
+# Editors / OS / tools
+.idea/
+.vscode/
+.claude/settings.local.json
+*.swp
+*~
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Local-only archive of legacy files, DB backups and phase snapshots
+_archive/
+*.zip
+
+# Personal working files (not part of the project)
+MANUAL_CHECKS.md
+docs/
+# Old Selenium tests: tied to accounts in the local dev database (rewrite before publishing)
+tests/e2e/

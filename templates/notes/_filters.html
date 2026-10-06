@@ -1,0 +1,17 @@
+{% load ui %}{% comment %}
+  The course list's filter panel: search + university on one row, the semester chips under a divider.
+  The university applies as soon as it's picked (js/core/forms.js, js/core/university.js); the Apply button
+  is there for keyboard and no-JavaScript users. Expects: placeholder and what views.notes._filters() returns.
+{% endcomment %}
+<form class="card filter-panel" method="get" role="search" data-autosubmit>
+  {% if chosen_term %}<input type="hidden" name="term" value="{{ chosen_term }}">{% endif %}
+  <div class="filter-panel__row">
+    <div class="search filter-panel__search">
+      {% icon "search" %}
+      <input class="input" type="search" name="q" value="{{ request.GET.q }}" placeholder="{{ placeholder }}" aria-label="{{ placeholder }}">
+    </div>
+    {% include "notes/_university_filter.html" with picker_id="f-university" %}
+    <button class="btn btn-primary filter-bar__apply" type="submit">Apply</button>
+  </div>
+  <div class="filter-panel__chips">{% include "notes/_term_chips.html" %}</div>
+</form>

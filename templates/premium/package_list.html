@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load static ui humanize %}
+{% block title %}Premium{% endblock %}
+{% block meta_description %}NoteSwap Premium: ask providers to solve the problems you're stuck on with NoteSolve.{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/premium.css' %}">{% endblock %}
+
+{% block content %}
+<section class="premium-hero">
+  <div class="wrap premium-hero__inner" data-reveal>
+    <span class="chip chip-deep">{% icon "crown" %}Premium</span>
+    <h1 class="t-display">Stuck on a problem? Ask a provider.</h1>
+    <p class="t-lead">Premium unlocks NoteSolve: send a question with a photo or PDF to a provider you trust, and get a worked solution back, right inside NoteSwap.</p>
+    {% if user.is_superuser %}
+      <a class="btn btn-secondary" href="{% url 'manage_premium' %}">{% icon "settings" size="sm" %}Manage packages and purchases</a>
+    {% endif %}
+  </div>
+</section>
+
+<div class="wrap section">
+  {# ---------- Where the student's Premium and latest order stand ---------- #}
+  {% if user.is_authenticated and not user.is_superuser %}
+    {% if is_premium_user or user.premium_until or purchase.status == 'pending' or purchase.status == 'rejected' %}
+    <div class="premium-states">
+      {% if is_premium_user %}
+        <section class="card premium-state premium-state--active" aria-label="Your Premium">
+          <span class="premium-state__icon">{% icon "crown" %}</span>
+          <div class="premium-state__body">
+            <h2 class="premium-state__title">You’re Premium until {{ user.premium_until|date:"j M Y" }}</h2>
+            <p class="t-small">{{ user.premium_until|timeuntil }} left. Buying another plan adds its months after that date, so you never lose paid days.</p>
+          </div>
+          <a class="btn btn-primary premium-state__action" href="{% url 'notesolve_dashboard' %}">{% icon "message" size="sm" %}Open NoteSolve</a>
+        </section>
+      {% elif user.premium_until %}
+        <section class="card premium-state" aria-label="Your Premium">
+          <span class="premium-state__icon">{% icon "clock" %}</span>
+          <div class="premium-state__body">
+            <h2 class="premium-state__title">Your Premium ended on {{ user.premium_until|date:"j M Y" }}</h2>
+            <p class="t-small">Your past answers are still in NoteSolve. Choose a plan below to ask new questions.</p>
+          </div>
+        </section>
+      {% endif %}
+
+      {% if purchase.status == 'pending' %}
+        <section class="card premium-state" aria-label="Your order">
+          <span class="premium-state__icon">{% icon "clock" %}</span>
+          <div class="premium-state__body">
+            <h2 class="premium-state__title">Your {{ purchase.package_name }} order is waiting for approval</h2>
+            <p class="t-small">An admin checks the payment, usually within a day. {% if is_premium_user %}Its months are added on top of your current Premium{% else %}Premium switches on{% endif %} as soon as it’s approved.</p>
+            <p class="premium-state__meta">৳ {{ purchase.amount|floatformat:0 }} · ordered {{ purchase.timestamp|naturaltime }}</p>
+          </div>
+        </section>
+      {% elif purchase.status == 'rejected' %}
+        <section class="card premium-state premium-state--rejected" aria-label="Your order">
+          <span class="premium-state__icon">{% icon "alert" %}</span>
+          <div class="premium-state__body">
+            <h2 class="premium-state__title">Your {{ purchase.package_name }} order wasn’t approved</h2>
+            <div class="premium-state__reason">
+              <span class="label">Reason from the admin</span>
+              <p>{{ purchase.rejection_reason }}</p>
+            </div>
+            <p class="premium-state__meta">৳ {{ purchase.amount|floatformat:0 }} · ordered {{ purchase.timestamp|naturaltime }}{% if purchase.reviewed_at %} · reviewed {{ purchase.reviewed_at|naturaltime }}{% endif %}</p>
+          </div>
+          <a class="btn btn-secondary premium-state__action" href="#plans">Order again{% icon "chev-down" size="sm" %}</a>
+        </section>
+      {% endif %}
+    </div>
+    {% endif %}
+  {% endif %}
+
+  {# ---------- Plans ---------- #}
+  <div class="plans" id="plans" data-reveal-stagger>
+    {% for package in packages %}
+      <article class="card plan{% if package.id == best_value_id %} plan--best{% endif %}" id="package-{{ package.id }}">
+        {% if package.id == best_value_id %}<span class="chip chip-deep chip-sm plan__badge">{% icon "star" %}Best value</span>{% endif %}
+        <header class="plan__head">
+          <h2 class="t-h3">{{ package.name }}</h2>
+          <span class="chip chip-line chip-sm">{{ package.duration_in_months }} month{{ package.duration_in_months|pluralize }}</span>
+        </header>
+        <div class="plan__price">
+          <p><span class="plan__currency">৳</span><span class="plan__amount">{{ package.price|floatformat:0 }}</span></p>
+          <p class="plan__per">
+            {% if package.duration_in_months > 1 %}৳ {{ package.per_month|floatformat:0 }} a month, paid once{% else %}One month of NoteSolve{% endif %}
+            {% if package.saving %}<span class="plan__save">Save {{ package.saving }}%</span>{% endif %}
+          </p>
+        </div>
+        <p class="t-small plan__desc">{{ package.description }}</p>
+        <ul class="plan__list">
+          <li>{% icon "check" size="sm" %}Ask any provider on NoteSolve</li>
+          <li>{% icon "check" size="sm" %}Attach photos or PDFs of the problem</li>
+          <li>{% icon "check" size="sm" %}Worked solutions you can download</li>
+        </ul>
+        <div class="plan__cta">
+          {% if user.is_superuser %}
+            <a class="btn btn-secondary btn-block" href="{% url 'edit_premium_package' package.id %}">{% icon "edit" size="sm" %}Edit package</a>
+          {% elif not user.is_authenticated %}
+            <a class="btn {% if package.id == best_value_id %}btn-primary{% else %}btn-secondary{% endif %} btn-block" href="{% url 'account_login' %}?next={% url 'purchase_premium_package' package.id %}">Sign in to buy</a>
+          {% elif user.user_type == 'basic' %}
+            <a class="btn {% if package.id == best_value_id %}btn-primary{% else %}btn-secondary{% endif %} btn-block" href="{% url 'purchase_premium_package' package.id %}">{% if is_premium_user %}Extend with {{ package.name }}{% else %}Buy Now{% endif %}</a>
+          {% endif %}
+        </div>
+      </article>
+    {% empty %}
+      <div class="empty"><span class="empty__icon">{% icon "crown" %}</span><span class="empty__title">Premium plans are coming soon</span><p>Check back shortly.</p></div>
+    {% endfor %}
+  </div>
+
+  {# ---------- How it works ---------- #}
+  <section class="premium-how" aria-labelledby="how-title">
+    <div class="premium-section-head">
+      <span class="eyebrow">NoteSolve</span>
+      <h2 class="t-h2" id="how-title">How it works</h2>
+      <p class="t-small muted">Three steps from stuck to solved.</p>
+    </div>
+    <ol class="card premium-steps" data-reveal>
+      <li class="premium-step">
+        <span class="premium-step__num">01</span>
+        <h3 class="t-h3">Pick a provider</h3>
+        <p class="t-small">Providers from your university and department are suggested first, with their solution ratings.</p>
+      </li>
+      <li class="premium-step">
+        <span class="premium-step__num">02</span>
+        <h3 class="t-h3">Send your question</h3>
+        <p class="t-small">Say which problem, what you tried and where you got stuck. Attach a photo or PDF.</p>
+      </li>
+      <li class="premium-step">
+        <span class="premium-step__num">03</span>
+        <h3 class="t-h3">Get a worked solution</h3>
+        <p class="t-small">The provider answers right here in NoteSwap. Rate it to help other students choose.</p>
+      </li>
+    </ol>
+  </section>
+
+  {# ---------- FAQ ---------- #}
+  <section class="premium-faq" aria-labelledby="faq-title">
+    <div class="premium-section-head">
+      <span class="eyebrow">Questions</span>
+      <h2 class="t-h2" id="faq-title">Good to know</h2>
+    </div>
+    <div class="premium-faq__list">
+      <details class="card faq-item"><summary>How do I pay?{% icon "chev-down" size="sm" %}</summary><p class="t-small">Choose a plan and confirm your order. An admin checks the payment and switches Premium on, usually within a day.</p></details>
+      <details class="card faq-item"><summary>What happens when my Premium ends?{% icon "chev-down" size="sm" %}</summary><p class="t-small">You can’t send new questions, but questions you already sent still get answered, and you can read and rate every answer in NoteSolve. Buying a plan before it ends adds the new months on top, so you never lose paid days.</p></details>
+      <details class="card faq-item"><summary>What if a provider can’t answer?{% icon "chev-down" size="sm" %}</summary><p class="t-small">They tell you why, and you can send the same question to another provider with one click.</p></details>
+      <details class="card faq-item"><summary>Do I need Premium to read notes?{% icon "chev-down" size="sm" %}</summary><p class="t-small">No. Reading, downloading, rating and following are free for everyone with an account. Premium is only for NoteSolve.</p></details>
+    </div>
+    <p class="t-small muted premium-faq__more">Something else? <a href="{% url 'contact' %}">Send us a message</a>.</p>
+  </section>
+</div>
+{% endblock %}

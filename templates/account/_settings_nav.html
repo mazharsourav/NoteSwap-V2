@@ -1,0 +1,30 @@
+{% load ui %}{% comment %}
+  Sidebar for your own account pages: profile, following, notifications and the allauth settings.
+{% endcomment %}
+{% with current=request.resolver_match.url_name %}
+<nav class="card account-nav side-menu" aria-label="Your account" data-side-menu>
+  <button class="side-menu__toggle" type="button" aria-expanded="false" aria-controls="account-menu" data-side-menu-toggle hidden>
+    <span class="visually-hidden">Your account: </span><span class="side-menu__current" data-side-menu-current>Your account</span>
+    <span class="count count-g" data-side-menu-waiting hidden></span>{% icon "chev-down" cls="side-menu__chev" %}
+  </button>
+  <div class="side-menu__list" id="account-menu">
+    <a class="sidelink{% if current == 'profile' or current == 'edit_profile' %} is-active" aria-current="page{% endif %}" href="{% url 'profile' %}">{% icon "user" %}<span>Profile</span></a>
+    <a class="sidelink{% if current == 'following' %} is-active" aria-current="page{% endif %}" href="{% url 'following' %}">{% icon "users" %}<span>Following</span></a>
+    <a class="sidelink{% if current == 'notifications' %} is-active" aria-current="page{% endif %}" href="{% url 'notifications' %}">{% icon "bell" %}<span>Notifications</span>{% if unread_notifications %}<span class="count count-g">{{ unread_notifications }}</span>{% endif %}</a>
+    {% if user.user_type == 'basic' and not user.is_superuser %}
+      {% if is_premium_user %}
+        <a class="sidelink" href="{% url 'notesolve_dashboard' %}">{% icon "message" %}<span>NoteSolve</span></a>
+      {% else %}
+        <a class="sidelink" href="{% url 'premium_packages' %}">{% icon "crown" %}<span>Premium</span></a>
+      {% endif %}
+    {% endif %}
+    <div class="account-nav__sep"></div>
+    <span class="account-nav__label">Sign-in &amp; security</span>
+    <a class="sidelink{% if current == 'account_email' %} is-active" aria-current="page{% endif %}" href="{% url 'account_email' %}">{% icon "mail" %}<span>Email addresses</span></a>
+    <a class="sidelink{% if current == 'account_change_password' or current == 'account_set_password' %} is-active" aria-current="page{% endif %}" href="{% url 'account_change_password' %}">{% icon "key" %}<span>Password</span></a>
+    <a class="sidelink{% if current == 'socialaccount_connections' %} is-active" aria-current="page{% endif %}" href="{% url 'socialaccount_connections' %}">{% icon "lock" %}<span>Connected accounts</span></a>
+    <div class="account-nav__sep"></div>
+    <a class="sidelink" href="{% url 'logout' %}" data-post-url="{% url 'logout' %}">{% icon "logout" %}<span>Sign out</span></a>
+  </div>
+</nav>
+{% endwith %}

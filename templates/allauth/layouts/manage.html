@@ -1,0 +1,17 @@
+{% extends "allauth/layouts/base.html" %}
+{% load static %}
+{% comment %}Account settings pages from allauth (email addresses, password, connected accounts).{% endcomment %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/account.css' %}">{% endblock %}
+
+{% block main %}
+<main id="main" class="account-page">
+  <div class="wrap account-layout">
+    {% include "account/_settings_nav.html" %}
+    <div class="account-content">
+      <section class="card card-pad settings-card">
+        {% block content %}{% endblock content %}
+      </section>
+    </div>
+  </div>
+</main>
+{% endblock main %}

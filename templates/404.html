@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}Page not found{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/error.css' %}">{% endblock %}
+
+{% block content %}
+<section class="wrap error-page">
+  <p class="error-page__code" aria-hidden="true">404</p>
+  <h1 class="t-h1">Page not found</h1>
+  <p>The page you’re looking for doesn’t exist, was moved, or isn’t available to you.</p>
+  <div class="cluster">
+    <a href="{% url 'subject_list' %}" class="btn btn-primary">Browse notes</a>
+    <a href="{% url 'home' %}" class="btn btn-secondary">Go to home</a>
+  </div>
+</section>
+{% endblock %}

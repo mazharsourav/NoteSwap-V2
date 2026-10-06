@@ -1,0 +1,24 @@
+/* 403 and 404 pages */
+.error-page {
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  max-width: 560px;
+  margin: 0 auto;
+  padding-block: clamp(56px, 10vw, 120px);
+  text-align: center;
+}
+.error-page__code {
+  font-size: clamp(4.5rem, 3rem + 6vw, 7.5rem);
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  color: var(--green-100);
+  -webkit-text-stroke: 2px var(--green-500);
+}
+.error-page__icon {
+  width: 56px; height: 56px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--r-pill);
+  background: var(--green-50); color: var(--green-700);
+}
+.error-page p { color: var(--muted); max-width: 460px; }
+.error-page .cluster { justify-content: center; --cluster: 12px; padding-top: 12px; }

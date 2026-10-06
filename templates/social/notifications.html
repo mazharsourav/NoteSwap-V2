@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static ui humanize %}
+{% block title %}Notifications{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/account.css' %}">{% endblock %}
+
+{% block main %}
+<main id="main" class="account-page">
+  <div class="wrap account-layout">
+    {% include "account/_settings_nav.html" %}
+    <div class="account-content">
+      <div class="settings-card__head">
+        <h1 class="t-h2">Notifications</h1>
+        <p class="t-small muted">New notes from providers you follow, your Premium orders and when Premium ends, and, if you’re a provider, new followers and notes that need a fix.</p>
+      </div>
+      {% if page.object_list %}
+        <ul class="card notification-list">
+          {% for item in page %}
+            <li>
+              <a class="notification-item{% if not item.is_read %} notification-item--unread{% endif %}" href="{{ item.url }}">
+                {% if item.actor %}{% avatar item.actor 40 %}{% else %}<span class="notification-item__icon">{% if item.kind|slice:":8" == "premium_" %}{% icon "crown" %}{% else %}{% icon "bell" %}{% endif %}</span>{% endif %}
+                <span class="notification-item__text">
+                  <span class="t-small ink">{{ item.text }}</span>
+                  <time class="t-cap" datetime="{{ item.created_at|date:'c' }}">{{ item.created_at|naturaltime }}</time>
+                </span>
+                <span class="notification-item__kind" aria-hidden="true">{% if item.kind == 'new_note' %}{% icon "file" size="sm" %}{% elif item.kind == 'note_rejected' or item.kind == 'premium_rejected' %}{% icon "alert" size="sm" %}{% elif item.kind == 'premium_ending' or item.kind == 'premium_ended' %}{% icon "clock" size="sm" %}{% elif item.kind|slice:":8" == "premium_" %}{% icon "crown" size="sm" %}{% else %}{% icon "user" size="sm" %}{% endif %}</span>
+                {% if not item.is_read %}<span class="unread-dot"><span class="visually-hidden">New</span></span>{% endif %}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+        {% include "components/_pagination.html" %}
+      {% else %}
+        <div class="empty">
+          <span class="empty__icon">{% icon "bell" %}</span>
+          <span class="empty__title">No notifications yet</span>
+          <p>Follow providers to hear when they publish new notes.</p>
+          <a class="btn btn-secondary btn-sm" href="{% url 'providers' %}">Browse providers</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</main>
+{% endblock %}

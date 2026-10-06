@@ -1,0 +1,40 @@
+{% load i18n %}<footer class="site-footer">
+  <div class="wrap site-footer__inner">
+    <div class="site-footer__grid">
+      <div class="site-footer__about">
+        {% include "partials/_brand.html" with small=True %}
+        <p>{% translate "Verified notes from students who have taken the course before you." %}</p>
+      </div>
+      <nav class="site-footer__col" aria-labelledby="footer-explore">
+        <h2 id="footer-explore">{% translate "Explore" %}</h2>
+        <ul>
+          <li><a class="flink" href="{% url 'subject_list' %}">{% translate "Notes" %}</a></li>
+          <li><a class="flink" href="{% url 'providers' %}">{% translate "Providers" %}</a></li>
+          <li><a class="flink" href="{% url 'premium_packages' %}">{% translate "Premium" %}</a></li>
+          <li><a class="flink" href="{% url 'become_provider' %}">{% translate "Become a provider" %}</a></li>
+        </ul>
+      </nav>
+      <nav class="site-footer__col" aria-labelledby="footer-help">
+        <h2 id="footer-help">{% translate "Help" %}</h2>
+        <ul>
+          <li><a class="flink" href="{% url 'help_center' %}">{% translate "Help Center" %}</a></li>
+          <li><a class="flink" href="{% url 'ask_question' %}">{% translate "Ask a question" %}</a></li>
+          <li><a class="flink" href="{% url 'send_feedback' %}">{% translate "Send feedback" %}</a></li>
+        </ul>
+      </nav>
+      <nav class="site-footer__col" aria-labelledby="footer-company">
+        <h2 id="footer-company">NoteSwap</h2>
+        <ul>
+          <li><a class="flink" href="{% url 'about' %}">{% translate "About" %}</a></li>
+          <li><a class="flink" href="{% url 'contact' %}">{% translate "Contact" %}</a></li>
+          <li><a class="flink" href="{% url 'terms_of_use' %}">{% translate "Terms of use" %}</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="site-footer__bottom">
+      <span>&copy; {% now "Y" %} NoteSwap. {% translate "All rights reserved." %}</span>
+      <span>{% translate "Made for university students in Bangladesh." %}{% if developer_name %}
+        <span class="site-footer__credit">{% translate "Built by" %} {% if developer_url %}<a class="flink" href="{{ developer_url }}" target="_blank" rel="noopener">{{ developer_name }}</a>{% else %}{{ developer_name }}{% endif %}</span>{% endif %}</span>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% comment %}
+  Frame for every Manage page (moderators and superusers): a sidebar with waiting counts
+  (manage_counts, from core.context_processors.navigation) and the page in {% block manage %}.
+{% endcomment %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/manage.css' %}">{% endblock %}
+
+{% block main %}
+<main id="main" class="manage">
+  <div class="wrap manage-layout">
+    <nav class="card manage-nav side-menu" aria-label="Manage" data-side-menu>
+      <button class="side-menu__toggle" type="button" aria-expanded="false" aria-controls="manage-menu" data-side-menu-toggle hidden>
+        <span class="visually-hidden">Manage: </span><span class="side-menu__current" data-side-menu-current>Manage</span>
+        <span class="count count-g" data-side-menu-waiting hidden></span>{% icon "chev-down" cls="side-menu__chev" %}
+      </button>
+      <div class="side-menu__list" id="manage-menu">
+        <span class="manage-nav__label">Manage</span>
+        <a class="sidelink{% if manage_url_name == 'Manage' %} is-active{% endif %}" href="{% url 'Manage' %}">{% icon "grid" %}<span>Overview</span></a>
+        <a class="sidelink{% if manage_url_name == 'verify_notes' %} is-active{% endif %}" href="{% url 'verify_notes' %}">{% icon "shield" %}<span>Review notes</span>{% if manage_counts.review %}<span class="count count-g">{{ manage_counts.review }}</span>{% endif %}</a>
+        <a class="sidelink{% if manage_url_name == 'provider_requests' or manage_url_name == 'provider_request_detail' %} is-active{% endif %}" href="{% url 'provider_requests' %}">{% icon "users" %}<span>Provider applications</span>{% if manage_counts.applications %}<span class="count count-g">{{ manage_counts.applications }}</span>{% endif %}</a>
+        <a class="sidelink{% if manage_url_name == 'inbox' %} is-active{% endif %}" href="{% url 'inbox' %}">{% icon "inbox" %}<span>Inbox</span>{% if manage_counts.inbox %}<span class="count count-g">{{ manage_counts.inbox }}</span>{% endif %}</a>
+        {% if user.is_superuser %}
+          <a class="sidelink{% if manage_url_name == 'manage_premium' or manage_url_name == 'add_premium_package' or manage_url_name == 'edit_premium_package' %} is-active{% endif %}" href="{% url 'manage_premium' %}">{% icon "crown" %}<span>Premium</span>{% if manage_counts.purchases %}<span class="count count-g">{{ manage_counts.purchases }}</span>{% endif %}</a>
+          <div class="manage-nav__sep"></div>
+          <a class="sidelink" href="{% url 'provider_solved_requests' %}">{% icon "message" %}<span>NoteSolve requests</span></a>
+          <a class="sidelink" href="{% url 'admin:index' %}">{% icon "settings" %}<span>Django admin</span>{% icon "external" size="sm" %}</a>
+        {% endif %}
+      </div>
+    </nav>
+    <div class="manage-content">
+      {% block manage %}{% endblock %}
+    </div>
+  </div>
+</main>
+{% endblock %}

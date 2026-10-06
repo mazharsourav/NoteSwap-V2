@@ -1,0 +1,16 @@
+{% load ui %}{% comment %}Accept / reject (with a reason the applicant sees) for one pending application. Expects: req.{% endcomment %}
+<div class="application-actions">
+  <form method="post" action="{% url 'provider_request_action' req.id 'accept' %}">
+    {% csrf_token %}
+    <button class="btn btn-primary btn-sm" type="submit">{% icon "check" size="sm" %}Accept</button>
+  </form>
+  <details class="reject-box">
+    <summary class="btn btn-secondary btn-sm">Reject…</summary>
+    <form class="reject-box__form" method="post" action="{% url 'provider_request_action' req.id 'reject' %}">
+      {% csrf_token %}
+      <label class="label" for="reason-{{ req.id }}">Reason (the applicant sees this)</label>
+      <textarea class="input" id="reason-{{ req.id }}" name="reason" rows="2" maxlength="1000" required placeholder="e.g. Please add your transcript."></textarea>
+      <button class="btn btn-primary btn-sm" type="submit">Reject application</button>
+    </form>
+  </details>
+</div>

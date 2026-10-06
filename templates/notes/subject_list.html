@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}Browse notes{% endblock %}
+{% block meta_description %}Browse verified university notes by course, from every university. Filter by university and semester.{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/notes.css' %}">{% endblock %}
+
+{% block content %}
+<section class="browse-head">
+  <div class="wrap stack" style="--stack: 28px">
+    <div class="page-head__row">
+      <div class="page-head__text">
+        <h1 class="t-h1">Browse notes</h1>
+        <p class="muted">Pick a course to see its notes from every university.</p>
+      </div>
+      {% if user.user_type == 'provider' or user.is_superuser %}
+        <a class="btn btn-secondary" href="{% url 'add_subject' %}">{% icon "plus" size="sm" %}Add a course</a>
+      {% endif %}
+    </div>
+    {% include "notes/_filters.html" with placeholder="Search courses" %}
+  </div>
+</section>
+
+<section class="section browse-body">
+  <div class="wrap">
+    <div class="results-bar">
+      <span class="t-small muted"><strong class="ink">{{ page.paginator.count }} course{{ page.paginator.count|pluralize }}</strong>{% if page.paginator.num_pages > 1 %} · showing {{ page.start_index }}–{{ page.end_index }}{% endif %}</span>
+      {% if filtering %}<a class="btn btn-ghost btn-sm" href="{% url 'subject_list' %}">{% icon "x" size="sm" %}Clear filters</a>{% endif %}
+    </div>
+
+    <div class="grid grid-subjects" data-reveal-stagger>
+      {% for subject in page %}
+        <a class="card lift subject-tile" href="{% url 'subject_detail' subject.id %}{{ carry }}">
+          <div class="subject-tile__top">
+            <span class="subject-card__icon">{% icon "book" %}</span>
+          </div>
+          <div class="subject-tile__name">
+            <h2 class="t-h3">{{ subject.name }}</h2>
+            {% if subject.universities %}
+              <span class="uni-chips">
+                {% for university in subject.universities|slice:":3" %}<span class="chip chip-line chip-sm" title="{{ university|uni_full }}">{{ university|uni_short|truncatechars:18 }}</span>{% endfor %}
+                {% if subject.universities|length > 3 %}<span class="uni-chips__more">+{{ subject.universities|length|add:"-3" }}</span>{% endif %}
+              </span>
+            {% else %}
+              <span class="t-small muted">No notes yet</span>
+            {% endif %}
+          </div>
+          <div class="subject-tile__foot">
+            <span class="t-small"><strong class="ink">{{ subject.note_count }}</strong> note{{ subject.note_count|pluralize }}</span>
+            <span class="subject-card__go">{% icon "arrow" %}</span>
+          </div>
+        </a>
+      {% empty %}
+        <div class="empty">
+          <span class="empty__icon">{% icon "search" %}</span>
+          {% if filtering %}
+            <span class="empty__title">{% if request.GET.q %}No courses match “{{ request.GET.q }}”{% elif chosen_university and chosen_term %}No {{ chosen_university|uni_short }} notes for {{ chosen_term }} yet{% elif chosen_term %}No notes for {{ chosen_term }} yet{% elif chosen_university %}No {{ chosen_university|uni_short }} notes yet{% else %}No courses match{% endif %}</span>
+            <p>{% if request.GET.q %}Try another name or remove a filter.{% else %}Try another semester or university, or be the first to share one.{% endif %}</p>
+            <div class="cluster">
+              {% if chosen_term %}<a class="btn btn-secondary btn-sm" href="{% querystring term=None year=None semester=None page=None %}">Show all semesters</a>
+              {% else %}<a class="btn btn-secondary btn-sm" href="{% url 'subject_list' %}">Clear filters</a>{% endif %}
+              {% if user.user_type == 'provider' or user.is_superuser %}<a class="btn btn-primary btn-sm" href="{% url 'upload_note' %}{% if chosen_term %}?term={{ chosen_term }}{% endif %}">{% icon "upload" size="sm" %}Upload a note</a>{% endif %}
+            </div>
+          {% else %}
+            <span class="empty__title">No courses yet</span>
+            <p>Courses appear here as soon as providers add them.</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+    {% include "components/_pagination.html" %}
+
+    {% if request.GET.q %}
+      <p class="search-hint t-small muted">Looking for a note? <a href="{% url 'search' %}?q={{ request.GET.q|urlencode }}">Search everything for “{{ request.GET.q }}”</a></p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+

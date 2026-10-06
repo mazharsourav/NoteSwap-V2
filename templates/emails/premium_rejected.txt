@@ -1,0 +1,6 @@
+{% extends "emails/_base.txt" %}{% block content %}We couldn't approve your {{ purchase.package_name }} order (Tk {{ purchase.amount|floatformat:0 }}).
+
+Reason: {{ purchase.rejection_reason }}
+
+You can choose a plan and order again here:
+{{ link }}{% endblock %}

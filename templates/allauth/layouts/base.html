@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% comment %}
+  Root layout for django-allauth pages. allauth pages set {% block head_title %}; entrance.html
+  (sign in, sign up, password reset, email confirmation) and manage.html (email addresses,
+  password, connected accounts) add their own page frames.
+{% endcomment %}
+{% block title %}{% block head_title %}{% endblock head_title %}{% endblock title %}

@@ -1,0 +1,17 @@
+{% comment %}
+  Semester chips: All semesters, 1-1 ... 4-2 (plus 1-3, 5-1 ... when some note is for them).
+  A chip with no notes (at the chosen university) is greyed out. Links keep the search and university.
+  Expects: term_chips and chosen_term (views.notes._filters()).
+{% endcomment %}
+<nav class="term-chips" aria-label="Semester" data-term-chips>
+  <a class="term-chip{% if not chosen_term %} is-active{% endif %}" href="{% querystring term=None year=None semester=None page=None %}"{% if not chosen_term %} aria-current="true"{% endif %}>All semesters</a>
+  {% for chip in term_chips %}
+    {% if chip.active %}
+      <a class="term-chip is-active" href="{% querystring term=chip.value year=None semester=None page=None %}" aria-current="true" aria-label="Semester {{ chip.value }}, {{ chip.count }} note{{ chip.count|pluralize }}">{{ chip.value }}</a>
+    {% elif chip.count %}
+      <a class="term-chip" href="{% querystring term=chip.value year=None semester=None page=None %}" aria-label="Semester {{ chip.value }}, {{ chip.count }} note{{ chip.count|pluralize }}" title="{{ chip.count }} note{{ chip.count|pluralize }}">{{ chip.value }}</a>
+    {% else %}
+      <span class="term-chip is-empty" aria-disabled="true" title="No notes for {{ chip.value }} yet">{{ chip.value }}</span>
+    {% endif %}
+  {% endfor %}
+</nav>

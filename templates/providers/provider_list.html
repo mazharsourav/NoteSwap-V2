@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}Providers{% endblock %}
+{% block meta_description %}Students who share verified notes on NoteSwap. Follow them to hear about new notes.{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/notes.css' %}">{% endblock %}
+
+{% block content %}
+<section class="browse-head">
+  <div class="wrap stack" style="--stack: 28px">
+    <div class="page-head__row">
+      <div class="page-head__text">
+        <h1 class="t-h1">Providers</h1>
+        <p class="muted">Students a year or two ahead who share their notes. Follow them to hear when they post something new.</p>
+      </div>
+      {% if not user.is_authenticated or user.user_type == 'basic' and not user.is_superuser %}
+        <a class="btn btn-secondary" href="{% url 'become_provider' %}">{% icon "plus" size="sm" %}Become a provider</a>
+      {% endif %}
+    </div>
+    <form class="card filter-bar" method="get" role="search" data-autosubmit>
+      <div class="search filter-bar__search">
+        {% icon "search" %}
+        <input class="input" type="search" name="q" value="{{ request.GET.q }}" placeholder="Search by name or university" aria-label="Search providers">
+      </div>
+      <label class="visually-hidden" for="p-sort">Sort</label>
+      <select class="input" id="p-sort" name="sort">
+        <option value="">Sort: Most notes</option>
+        <option value="followers"{% if request.GET.sort == 'followers' %} selected{% endif %}>Sort: Most followers</option>
+        <option value="name"{% if request.GET.sort == 'name' %} selected{% endif %}>Sort: Name</option>
+      </select>
+      <button class="btn btn-primary filter-bar__apply" type="submit">Apply</button>
+    </form>
+  </div>
+</section>
+
+<section class="section browse-body">
+  <div class="wrap">
+    <div class="results-bar">
+      <span class="t-small muted"><strong class="ink">{{ provider_data|length }} provider{{ provider_data|length|pluralize }}</strong></span>
+      {% if request.GET.q %}<a class="btn btn-ghost btn-sm" href="{% url 'providers' %}">{% icon "x" size="sm" %}Clear search</a>{% endif %}
+    </div>
+    <div class="grid grid-providers" data-reveal-stagger>
+      {% for item in provider_data %}
+        {% include "components/_provider_card.html" with provider=item.provider note_count=item.note_count follower_count=item.follower_count %}
+      {% empty %}
+        <div class="empty">
+          <span class="empty__icon">{% icon "users" %}</span>
+          {% if request.GET.q %}
+            <span class="empty__title">No providers match “{{ request.GET.q }}”</span>
+            <p>Try part of the name, or the university.</p>
+          {% else %}
+            <span class="empty__title">No providers yet</span>
+            <p>Top students can apply to share their notes here.</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}Help Center{% endblock %}
+{% block meta_description %}Answers about NoteSwap: accounts, finding notes, following providers, uploading, Premium and NoteSolve.{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/pages.css' %}">{% endblock %}
+{% block scripts %}<script src="{% static 'js/pages/help.js' %}" defer></script>{% endblock %}
+
+{% block content %}
+<section class="help-hero">
+  <div class="wrap help-hero__inner">
+    <span class="eyebrow">Help Center</span>
+    <h1 class="t-h1">How can we help?</h1>
+    <div class="search help-search">
+      {% icon "search" %}
+      <input class="input" type="search" placeholder="Search help, e.g. “password” or “upload”" aria-label="Search help" data-help-search>
+    </div>
+  </div>
+</section>
+
+<div class="wrap section" style="padding-top: 40px">
+  <div class="help-grid" data-help-list>
+    {% for article in articles %}
+      <a class="card lift help-card" href="{% url 'help_article' article.slug %}" data-help-item="{{ article.title }} {{ article.summary }}">
+        <span class="subject-card__icon">{% icon article.icon %}</span>
+        <h2 class="t-h3">{{ article.title }}</h2>
+        <p class="t-small muted">{{ article.summary }}</p>
+        <span class="link-arrow">Read more{% icon "arrow" size="sm" %}</span>
+      </a>
+    {% endfor %}
+  </div>
+
+  <section class="help-faq" aria-labelledby="faq-title">
+    <h2 class="t-h2" id="faq-title">Common questions</h2>
+    <div class="stack" style="--stack: 12px" data-help-list>
+      {% for question, answer in faqs %}
+        <details class="card faq-item" data-help-item="{{ question }} {{ answer }}">
+          <summary>{{ question }}{% icon "chev-down" size="sm" %}</summary>
+          <p class="t-small">{{ answer }}</p>
+        </details>
+      {% endfor %}
+    </div>
+  </section>
+
+  <p class="empty help-none" data-help-empty hidden><span class="empty__title">No help articles match that.</span><span class="t-small muted">Try another word, or <a href="{% url 'ask_question' %}">ask us directly</a>.</span></p>
+
+  <section class="help-contact">
+    <div>
+      <h2 class="t-h3">Still stuck?</h2>
+      <p class="t-small muted">Send us a question and we’ll reply by email.</p>
+    </div>
+    <div class="cluster">
+      <a class="btn btn-primary" href="{% url 'ask_question' %}">{% icon "message" size="sm" %}Ask a question</a>
+      <a class="btn btn-secondary" href="{% url 'contact' %}">Contact us</a>
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,137 @@
+/* Site header, account dropdown and the phone menu (js/core/nav.js). Dropdown panels: navigation.css. */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  background: rgba(255, 255, 255, .92);
+  -webkit-backdrop-filter: saturate(1.4) blur(10px);
+  backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--line);
+  transition: box-shadow var(--t-med) var(--ease);
+}
+.site-header.is-scrolled { box-shadow: 0 6px 20px rgba(22, 33, 28, .06); }
+
+.site-header__inner { height: var(--header-h); display: flex; align-items: center; gap: 44px; }
+.site-header__actions { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+
+/* Logo: green tile with an open book, then the word mark */
+.brand { display: inline-flex; align-items: center; gap: 10px; flex: none; color: var(--ink); }
+.brand:hover { color: var(--ink); }
+.brand__mark {
+  --mark: 34px;
+  width: var(--mark); height: var(--mark);
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: calc(var(--mark) * .3);
+  background: var(--green-500); color: var(--white);
+  transition: transform var(--t-med) var(--ease);
+}
+.brand__mark .icon { width: calc(var(--mark) * .58); height: calc(var(--mark) * .58); stroke-width: 2; }
+.brand:hover .brand__mark { transform: rotate(-6deg); }
+.brand__word { font-size: 21px; line-height: 1; font-weight: 900; letter-spacing: -0.03em; }
+.brand__word span { color: var(--green-700); }
+.brand-sm .brand__mark { --mark: 30px; }
+.brand-sm .brand__word { font-size: 19px; }
+
+/* Main navigation */
+.site-nav { display: flex; align-items: center; gap: 30px; }
+.site-nav__link {
+  position: relative;
+  padding: 26px 2px;
+  font-size: 15px; font-weight: 700; line-height: 1;
+  color: var(--text);
+}
+.site-nav__link::after {
+  content: "";
+  position: absolute; left: 0; right: 0; bottom: -1px;
+  height: 2px; border-radius: 2px;
+  background: var(--green-500);
+  transform: scaleX(0);
+  transition: transform var(--t-med) var(--ease);
+}
+.site-nav__link:hover { color: var(--ink); }
+.site-nav__link:hover::after { transform: scaleX(.4); }
+.site-nav__link.is-active { color: var(--ink); }
+.site-nav__link.is-active::after { transform: scaleX(1); }
+
+.header-icon { position: relative; color: var(--text); }
+.header-icon:hover { color: var(--ink); background: var(--surface); }
+.notif-badge {
+  position: absolute; top: 5px; right: 4px;
+  min-width: 18px; height: 18px; padding: 0 5px;
+  border: 2px solid var(--white);
+  border-radius: var(--r-pill);
+  background: var(--green-700); color: var(--white);
+  font-size: 11px; font-weight: 900; line-height: 14px; text-align: center;
+  animation: badge-pop .4s var(--ease);
+}
+@keyframes badge-pop { from { transform: scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.premium-chip { margin: 0 4px; }
+
+/* Account dropdown */
+.account-menu { position: relative; margin-left: 6px; }
+.account-menu__toggle {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 6px 4px 4px;
+  border: 0; border-radius: var(--r-pill);
+  background: none; color: var(--text);
+  transition: background-color var(--t-fast) var(--ease);
+}
+.account-menu__toggle:hover, .account-menu__toggle[aria-expanded="true"] { background: var(--surface); }
+.account-menu__toggle .icon { transition: transform var(--t-fast) var(--ease); }
+.account-menu__toggle[aria-expanded="true"] .icon { transform: rotate(180deg); }
+.account-menu__panel { width: 260px; }
+.account-menu__who { display: flex; align-items: center; gap: 12px; padding: 10px 10px 14px; margin-bottom: 6px; border-bottom: 1px solid var(--line); }
+.account-menu__name { display: flex; flex-direction: column; min-width: 0; }
+.account-menu__who strong { color: var(--ink); font-size: 15px; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-menu__who .t-cap { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Phone menu: full screen, slides down */
+.menu-toggle, .header-avatar { display: none; }
+.mobile-menu {
+  position: fixed; inset: 0;
+  z-index: var(--z-menu);
+  display: flex; flex-direction: column;
+  overflow-y: auto;
+  background: var(--white);
+  animation: menu-in var(--t-med) var(--ease);
+}
+@keyframes menu-in { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
+.mobile-menu__top {
+  height: var(--header-h); flex: none;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 10px 0 var(--gutter);
+  border-bottom: 1px solid var(--line);
+}
+.mobile-menu__body { display: flex; flex-direction: column; gap: 24px; flex-grow: 1; padding: 20px var(--gutter) 28px; }
+.mobile-menu__user { display: flex; align-items: center; gap: 12px; padding: 16px; }
+.mobile-menu__name { display: flex; flex-direction: column; flex-grow: 1; min-width: 0; }
+.mobile-menu__user strong { color: var(--ink); }
+.mobile-menu__nav { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+.mobile-menu__link {
+  display: flex; align-items: center; gap: 14px;
+  height: 56px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 18px; font-weight: 800;
+}
+.mobile-menu__link > .icon { color: var(--green-700); }
+.mobile-menu__link > span:first-of-type { flex-grow: 1; }
+.mobile-menu__link.is-active { color: var(--green-700); }
+.mobile-menu__foot { display: flex; flex-direction: column; gap: 14px; margin-top: auto; }
+.mobile-menu__links { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.mobile-menu .motion-item { animation: menu-item-in var(--t-slow) var(--ease) both; animation-delay: calc(var(--i, 0) * 35ms + 60ms); }
+@keyframes menu-item-in { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+
+@media (max-width: 1080px) {
+  .site-header__inner { gap: 28px; }
+  .site-nav { gap: 22px; }
+}
+
+@media (max-width: 900px) {
+  .site-nav, .account-menu, .header-search, .header-upload, .premium-chip, .header-signup { display: none; }
+  .menu-toggle { display: inline-flex; color: var(--ink); }
+  .header-avatar { display: inline-flex; padding: 0 4px; }
+  .site-header__inner { padding-right: 10px; }
+}

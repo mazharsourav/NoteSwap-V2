@@ -1,0 +1,30 @@
+{% load ui humanize %}{% comment %}
+  A note as a list row (subject page, search). Needs a note from published_notes().
+  Optional: show_subject=True adds the subject.
+{% endcomment %}
+<li>
+  <a class="note-row" href="{% url 'note_detail' note.id %}">
+    {% include "components/_note_cover.html" with size="sm" cls="note-row__thumb" %}
+    <div class="note-row__body">
+      <div class="note-row__title">
+        <h3 class="t-h3">{{ note.name }}</h3>
+        {% if show_subject %}<span class="chip chip-sm">{{ note.subject.name }}</span>{% endif %}
+      </div>
+      {% if note.caption %}<p class="t-small muted note-row__caption">{{ note.caption }}</p>{% endif %}
+      <div class="note-row__meta t-cap">
+        <span class="note-row__by">{% avatar note.provider 22 %}{{ note.provider|display_name }}</span>
+        <span class="note-row__place">{{ note.university|uni_short }}{% if note.course_code %} · {{ note.course_code }}{% endif %} · {{ note.term }}</span>
+        <span>{{ note.uploaded_at|naturaltime }}</span>
+        <span class="note-row__type">{% if note.note_type == 'image' %}{% icon "image" size="sm" %}Image{% else %}{% icon "file" size="sm" %}PDF{% endif %}</span>
+      </div>
+    </div>
+    <div class="note-row__side">
+      {% if note.rating_count %}
+        <span class="rating"><span class="visually-hidden">Rated </span>{% icon "star" cls="star is-on" %}{{ note.avg_rating|floatformat:1 }}<span class="visually-hidden"> out of 5</span><span class="rating__count">({{ note.rating_count }}<span class="visually-hidden"> rating{{ note.rating_count|pluralize }}</span>)</span></span>
+      {% else %}
+        <span class="t-cap">No ratings yet</span>
+      {% endif %}
+      <span class="note-row__open">Open{% icon "arrow" size="sm" %}</span>
+    </div>
+  </a>
+</li>

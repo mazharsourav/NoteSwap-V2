@@ -1,0 +1,65 @@
+{% load i18n static %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{% endblock %}{% block title_suffix %} · NoteSwap{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Verified notes from university students in Bangladesh, organised by course.{% endblock %}">
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="icon" href="{% static 'img/brand/mark.svg' %}" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap">
+
+  {# .js: JavaScript is on. .motion: animations allowed (falls back to visible if motion.js never runs). #}
+  <script>
+    document.documentElement.classList.add('js');
+    if ('IntersectionObserver' in window && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+      document.documentElement.classList.add('motion');
+      window.__motionFallback = setTimeout(function () { document.documentElement.classList.remove('motion'); }, 3000);
+    }
+  </script>
+
+  {# Shared styles: tokens and base first, then components. Page styles go in {% block styles %}. #}
+  <link rel="stylesheet" href="{% static 'css/base/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/base/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/base/layout.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/buttons.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/forms.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/cards.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/navigation.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/messages.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/dialogs.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/header.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/footer.css' %}">
+  {% block styles %}{% endblock %}
+</head>
+<body>
+  <a class="skip-link" href="#main">{% translate "Skip to content" %}</a>
+
+  {% include "partials/_header.html" %}
+  {% include "partials/_messages.html" %}
+
+  {% block main %}
+  <main id="main" class="{% block main_class %}{% endblock %}">
+    {% block content %}{% endblock %}
+  </main>
+  {% endblock %}
+
+  {% include "partials/_footer.html" %}
+
+  {# Shared form used by links marked data-post-url (see js/core/post-actions.js) #}
+  <form id="post-action-form" method="post" hidden>{% csrf_token %}</form>
+
+  <script src="{% static 'js/core/post-actions.js' %}" defer></script>
+  <script src="{% static 'js/core/nav.js' %}" defer></script>
+  <script src="{% static 'js/core/messages.js' %}" defer></script>
+  <script src="{% static 'js/core/dialogs.js' %}" defer></script>
+  <script src="{% static 'js/core/forms.js' %}" defer></script>
+  <script src="{% static 'js/core/university.js' %}" defer></script>
+  <script src="{% static 'js/core/motion.js' %}" defer></script>
+  {% block scripts %}{% endblock %}
+  {% block extra_body %}{% endblock %}
+</body>
+</html>

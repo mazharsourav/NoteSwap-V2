@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+{% load static ui %}
+
+{% block title %}NoteSwap · Verified notes from students who aced the course{% endblock %}
+{% block title_suffix %}{% endblock %}
+
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/home.css' %}">{% endblock %}
+
+{% block content %}
+
+{# ---------- Hero ---------- #}
+<section class="hero">
+  <div class="wrap hero__grid">
+    <div class="hero__text" data-reveal>
+      {% if user.is_authenticated %}
+        <span class="eyebrow">Welcome back, {{ user.first_name|default:user.username }}</span>
+        <h1 class="t-display">What are you studying today?</h1>
+        <p class="t-lead">Find notes by course. Every note is checked by a moderator before it goes live.</p>
+      {% else %}
+        <span class="eyebrow">For university students in Bangladesh</span>
+        <h1 class="t-display">Notes from students who already aced the course.</h1>
+        <p class="t-lead">Browse verified notes by course, shared by top students. Browsing is free; sign in to open a note.</p>
+      {% endif %}
+
+      <form class="hero__search" role="search" action="{% url 'search' %}" method="get">
+        <div class="search">
+          {% icon "search" %}
+          <input class="input" type="search" name="q" placeholder="Search a course, code or note" aria-label="Search notes">
+        </div>
+        <button class="btn btn-primary btn-lg" type="submit">Search</button>
+      </form>
+
+      {% if subjects %}
+        <div class="hero__popular">
+          <span class="t-small muted">Popular:</span>
+          {% for subject in subjects|slice:":4" %}
+            <a class="chip chip-line" href="{% url 'subject_detail' subject.id %}">{{ subject.name }}</a>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if stats.notes >= 20 %}
+        <dl class="hero__stats">
+          <div><dt>verified notes</dt><dd data-count-to="{{ stats.notes }}">{{ stats.notes }}</dd></div>
+          <div><dt>providers</dt><dd data-count-to="{{ stats.providers }}">{{ stats.providers }}</dd></div>
+          <div><dt>students</dt><dd data-count-to="{{ stats.students }}">{{ stats.students }}</dd></div>
+        </dl>
+      {% endif %}
+    </div>
+
+    <div class="hero__visual dots" aria-hidden="true" inert>
+      <div class="doc hero__page"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <span class="chip hero__badge">{% icon "shield" %}Checked by a moderator</span>
+      {% if top_rated_notes %}
+        <div class="hero__card">{% include "components/_note_card.html" with note=top_rated_notes.0 %}</div>
+      {% endif %}
+      <div class="card hero__toast">
+        <span class="hero__toast-icon">{% icon "bell" %}</span>
+        <span class="hero__toast-text"><strong>New note</strong> from a provider you follow<span class="t-cap">Follow providers to hear first</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ---------- From providers you follow ---------- #}
+{% if following_notes %}
+<section class="section">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <div class="section-head__text"><span class="eyebrow">Following</span><h2 class="t-h2">New from providers you follow</h2></div>
+      <a class="btn btn-ghost" href="{% url 'following' %}">Manage following{% icon "arrow" size="sm" cls="icon-arrow" %}</a>
+    </div>
+    <div class="grid grid-notes" data-reveal-stagger>
+      {% for note in following_notes %}{% include "components/_note_card.html" %}{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ---------- Subjects ---------- #}
+<section class="section">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <div class="section-head__text"><span class="eyebrow">Browse</span><h2 class="t-h2">Start with your course</h2></div>
+      <a class="btn btn-ghost" href="{% url 'subject_list' %}">All courses{% icon "arrow" size="sm" cls="icon-arrow" %}</a>
+    </div>
+    <div class="grid grid-subjects" data-reveal-stagger>
+      {% for subject in subjects %}
+        <a class="card lift subject-card" href="{% url 'subject_detail' subject.id %}">
+          <span class="subject-card__icon">{% icon "book" %}</span>
+          <span class="subject-card__text">
+            <span class="t-h3">{{ subject.name }}</span>
+            <span class="t-small muted">{{ subject.note_count }} note{{ subject.note_count|pluralize }}</span>
+          </span>
+          <span class="subject-card__go">{% icon "arrow" %}</span>
+        </a>
+      {% empty %}
+        <div class="empty">
+          <span class="empty__icon">{% icon "book" %}</span>
+          <span class="empty__title">No courses yet</span>
+          <p>Courses appear here as soon as providers start sharing notes.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ---------- Top rated ---------- #}
+<section class="section">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <div class="section-head__text"><span class="eyebrow">Top rated</span><h2 class="t-h2">Notes students rate highest</h2></div>
+      <a class="btn btn-ghost" href="{% url 'subject_list' %}">Browse all notes{% icon "arrow" size="sm" cls="icon-arrow" %}</a>
+    </div>
+    <div class="grid grid-notes" data-reveal-stagger>
+      {% for note in top_rated_notes %}
+        {% include "components/_note_card.html" %}
+      {% empty %}
+        <div class="empty">
+          <span class="empty__icon">{% icon "file" %}</span>
+          <span class="empty__title">No notes published yet</span>
+          <p>Once a moderator approves the first notes, the best rated ones show up here.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ---------- How it works ---------- #}
+<section class="section-band">
+  <div class="wrap how">
+    <div class="how__intro" data-reveal>
+      <span class="eyebrow">How it works</span>
+      <h2 class="t-h2">From search to studying in a minute</h2>
+      <p class="muted">No uploads needed to get started. Find what you need, open it, and help the next student by rating it.</p>
+    </div>
+    <ol class="how__steps" data-reveal-stagger>
+      <li><span class="how__num">01</span><h3 class="t-h3">Find your course</h3><p class="t-small">Pick a course to see its notes from every university, best rated first. Filter to your university, year and semester.</p></li>
+      <li><span class="how__num">02</span><h3 class="t-h3">Open and study</h3><p class="t-small">Sign in to read in the browser or download. Every note was checked by a moderator.</p></li>
+      <li><span class="how__num">03</span><h3 class="t-h3">Rate and follow</h3><p class="t-small">Rate what helped, and follow providers to hear when they post something new.</p></li>
+    </ol>
+  </div>
+</section>
+
+{# ---------- Providers ---------- #}
+<section class="section">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <div class="section-head__text"><span class="eyebrow">Providers</span><h2 class="t-h2">Learn from students a year ahead</h2></div>
+      <a class="btn btn-ghost" href="{% url 'providers' %}">All providers{% icon "arrow" size="sm" cls="icon-arrow" %}</a>
+    </div>
+    <div class="grid grid-providers" data-reveal-stagger>
+      {% for item in providers %}
+        {% include "components/_provider_card.html" with provider=item.provider note_count=item.note_count follower_count=item.follower_count %}
+      {% empty %}
+        <div class="empty">
+          <span class="empty__icon">{% icon "users" %}</span>
+          <span class="empty__title">No providers yet</span>
+          <p>Top students can apply to share their notes here.</p>
+          <a class="btn btn-secondary btn-sm" href="{% url 'become_provider' %}">Apply to be a provider</a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ---------- Become a provider ---------- #}
+{% if not user.is_authenticated or user.user_type == 'basic' and not user.is_superuser %}
+<section class="section">
+  <div class="wrap">
+    <div class="band" data-reveal>
+      <div class="band__text">
+        <span class="eyebrow">For providers</span>
+        <h2 class="t-h2">Your notes could save someone’s semester.</h2>
+        <p>Apply once. After a moderator approves you, you can upload notes, build a following and answer NoteSolve questions.</p>
+      </div>
+      <a class="btn btn-light btn-lg" href="{% url 'become_provider' %}">Apply to be a provider</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ---------- Reviews ---------- #}
+<section class="section" id="reviews">
+  <div class="wrap">
+    <div class="section-head" data-reveal>
+      <div class="section-head__text"><span class="eyebrow">Reviews</span><h2 class="t-h2">What students say</h2></div>
+      {% if user.is_authenticated %}
+        <button class="btn btn-secondary" type="button" data-dialog-open="review-dialog">{% icon "edit" size="sm" %}Write a review</button>
+      {% else %}
+        <a class="btn btn-secondary" href="{% url 'account_login' %}?next={% url 'home' %}%23reviews">Sign in to write a review</a>
+      {% endif %}
+    </div>
+    <div class="grid grid-3" data-reveal-stagger>
+      {% for review in reviews %}
+        <figure class="card review-card">
+          <span class="review-card__mark">{% icon "quote" size="lg" %}</span>
+          <blockquote>{{ review.comment|truncatechars:280 }}</blockquote>
+          <figcaption>
+            {% avatar review.user 40 cls="is-alt" %}
+            <span class="review-card__who"><strong>{{ review.user|display_name }}</strong><span class="t-cap">{{ review.user.university|uni_short|default:"NoteSwap student" }}</span></span>
+          </figcaption>
+        </figure>
+      {% empty %}
+        <div class="empty">
+          <span class="empty__icon">{% icon "message" %}</span>
+          <span class="empty__title">No reviews yet</span>
+          <p>Tell other students what NoteSwap is like. Your review shows up here.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% if user.is_authenticated %}
+<dialog class="dialog" id="review-dialog" aria-labelledby="review-dialog-title"{% if review_form.errors %} data-open{% endif %}>
+  <form class="dialog__body" method="post" action="{% url 'home' %}">
+    {% csrf_token %}
+    <div class="dialog__head">
+      <div>
+        <h2 class="t-h2" id="review-dialog-title">Write a review</h2>
+        <p class="t-small muted">How has NoteSwap helped you? Reviews are public and show your name.</p>
+      </div>
+      <button class="btn btn-ghost btn-icon dialog__close" type="button" data-dialog-close aria-label="Close">{% icon "x" %}</button>
+    </div>
+    <div class="field{% if review_form.comment.errors %} has-error{% endif %}">
+      <label class="label" for="{{ review_form.comment.id_for_label }}">Your review</label>
+      {{ review_form.comment }}
+      {% for error in review_form.comment.errors %}<span class="field-error">{% icon "alert" %}{{ error }}</span>{% endfor %}
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">Post review</button>
+      <button class="btn btn-ghost is-plain" type="button" data-dialog-close>Cancel</button>
+    </div>
+  </form>
+</dialog>
+{% endif %}
+
+{# ---------- Premium ---------- #}
+{% if not user.is_authenticated or user.user_type == 'basic' and not user.is_superuser and not is_premium_user %}
+<section class="section">
+  <div class="wrap">
+    <div class="card premium-teaser" data-reveal>
+      <div class="premium-teaser__text">
+        <span class="chip chip-deep">{% icon "crown" %}Premium</span>
+        <h2 class="t-h2">Stuck on a problem? Ask a provider.</h2>
+        <p>With NoteSolve, send your question and files to a provider you trust and get a worked solution back, right inside NoteSwap.</p>
+        <a class="btn btn-primary" href="{% url 'premium_packages' %}">See Premium plans{% icon "arrow" size="sm" cls="icon-arrow" %}</a>
+      </div>
+      <div class="premium-teaser__demo dots" aria-hidden="true">
+        <div class="card solve-demo">
+          <div class="solve-demo__head"><span class="t-small ink strong">Calculus II · Integration by parts</span><span class="chip chip-sm">{% icon "check" %}Solved</span></div>
+          <p class="t-small">“Question 4 from last year’s midterm. I get a different answer every time.”</p>
+          <div class="solve-demo__foot"><span class="avatar" style="--size: 28px">P</span><span class="t-cap">A provider sent a worked solution · 2 files</span></div>
+        </div>
+        <div class="card solve-demo solve-demo--small">
+          <span class="t-small ink strong">Optics · Thin film question</span>
+          <span class="chip chip-gray chip-sm">{% icon "clock" %}Pending</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

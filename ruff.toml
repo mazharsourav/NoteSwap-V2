@@ -1,0 +1,7 @@
+# Lint settings for `ruff check core config tests`.
+# For now only real errors (pyflakes: unused/undefined names, bad imports).
+# Style rules are added in Phase 8 together with CI.
+extend-exclude = ["core/migrations", "_archive"]
+
+[lint]
+select = ["F"]

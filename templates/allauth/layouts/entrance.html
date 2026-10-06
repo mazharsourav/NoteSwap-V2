@@ -1,0 +1,32 @@
+{% extends "allauth/layouts/base.html" %}
+{% load static ui %}
+{% comment %}
+  Sign in, sign up, password reset, email confirmation: the form on the left, a quiet green
+  panel on the right (hidden on small screens).
+{% endcomment %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/auth.css' %}">{% endblock %}
+
+{% block main %}
+<main id="main" class="auth">
+  <div class="auth__main">
+    <div class="auth__box">
+      {% block content %}{% endblock content %}
+    </div>
+  </div>
+  <aside class="auth__aside dots" aria-hidden="true">
+    <div class="auth__art">
+      <div class="doc auth__page"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="card auth__card">
+        <span class="chip chip-sm">Verified note</span>
+        <span class="t-h3">Your next exam, already summarised by someone who aced it.</span>
+        <span class="t-small muted">{% icon "star" cls="star is-on" %} Rated by students like you</span>
+      </div>
+    </div>
+    <ul class="auth__points">
+      <li><span class="auth__point-icon">{% icon "shield" size="sm" %}</span><span><strong>Every note is checked</strong>A moderator reviews each upload before it goes live.</span></li>
+      <li><span class="auth__point-icon">{% icon "users" size="sm" %}</span><span><strong>Follow providers</strong>Get a notification when they publish something new.</span></li>
+      <li><span class="auth__point-icon">{% icon "book" size="sm" %}</span><span><strong>Free to browse</strong>See every course and note before you sign in.</span></li>
+    </ul>
+  </aside>
+</main>
+{% endblock main %}

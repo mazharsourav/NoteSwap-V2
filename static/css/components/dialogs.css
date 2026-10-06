@@ -1,0 +1,23 @@
+/*
+  Modal dialogs (js/core/dialogs.js). Put all content in .dialog__body: the <dialog> itself has
+  no padding, so a click that lands on it is a click on the backdrop and closes it.
+*/
+.dialog {
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100vh - 64px);
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-2xl);
+  background: var(--white);
+  color: var(--text);
+  box-shadow: 0 24px 64px rgba(10, 61, 44, .18);
+}
+.dialog[open] { animation: dialog-in var(--t-med) var(--ease); }
+.dialog::backdrop { background: rgba(22, 33, 28, .42); animation: backdrop-in var(--t-med) var(--ease); }
+@keyframes dialog-in { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+
+.dialog__body { display: flex; flex-direction: column; gap: 20px; padding: 28px; }
+.dialog__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.dialog__head > div { display: flex; flex-direction: column; gap: 6px; }
+.dialog__close { margin: -8px -8px 0 0; color: var(--muted); }

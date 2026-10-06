@@ -1,0 +1,6 @@
+# Runtime dependencies (pinned). Install: pip install -r requirements.txt
+Django==5.2.17
+django-environ==0.14.0
+Pillow==12.3.0
+# Sign up / sign in, email verification, password reset, Google sign-in
+django-allauth[socialaccount]==65.19.6

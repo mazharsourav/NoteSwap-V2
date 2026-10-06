@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load ui humanize %}
+{% block title %}Order received{% endblock %}
+
+{% block content %}
+<div class="wrap wrap-form form-page">
+  <div class="card form-card status-card">
+    {% if purchase.status == 'approved' and is_premium_user %}
+      <span class="status-card__icon">{% icon "check" size="lg" %}</span>
+      <h1 class="t-h2">You’re a Premium member</h1>
+      <p>Your {{ purchase.package_name }} plan is active. Premium runs until {{ user.premium_until|date:"j M Y" }}.</p>
+      <div class="form-actions"><a class="btn btn-primary" href="{% url 'notesolve_dashboard' %}">Open NoteSolve</a></div>
+    {% elif purchase.status == 'rejected' %}
+      <span class="status-card__icon">{% icon "x" size="lg" %}</span>
+      <h1 class="t-h2">Your order wasn’t approved</h1>
+      <p>Reason: {{ purchase.rejection_reason }}</p>
+      <div class="form-actions">
+        <a class="btn btn-primary" href="{% url 'premium_packages' %}">Choose a plan again</a>
+        <a class="btn btn-ghost is-plain" href="{% url 'subject_list' %}">Browse notes</a>
+      </div>
+    {% elif purchase.status != 'pending' %}
+      <span class="status-card__icon">{% icon "crown" size="lg" %}</span>
+      <h1 class="t-h2">No order waiting</h1>
+      <p>{% if user.premium_until %}Your Premium ended on {{ user.premium_until|date:"j M Y" }}. {% endif %}Choose a plan to use NoteSolve.</p>
+      <div class="form-actions"><a class="btn btn-primary" href="{% url 'premium_packages' %}">See Premium plans</a></div>
+    {% else %}
+      <span class="status-card__icon">{% icon "clock" size="lg" %}</span>
+      <h1 class="t-h2">Your order is waiting for approval</h1>
+      <p>Thanks{% if purchase %} for ordering {{ purchase.package_name }}{% endif %}! An admin checks the payment and switches Premium on, usually within a day. You can keep reading notes in the meantime.</p>
+      <div class="form-actions">
+        <a class="btn btn-primary" href="{% url 'subject_list' %}">Browse notes</a>
+        <a class="btn btn-ghost is-plain" href="{% url 'premium_packages' %}">Back to Premium</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

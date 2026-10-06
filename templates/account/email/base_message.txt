@@ -1,0 +1,8 @@
+{% load i18n %}{% autoescape off %}{% blocktrans %}Hello from NoteSwap!{% endblocktrans %}
+
+{% block content %}{% endblock content %}
+
+{% blocktrans with site_domain=current_site.domain %}Thanks for using NoteSwap.
+The NoteSwap team
+{{ site_domain }}{% endblocktrans %}
+{% endautoescape %}

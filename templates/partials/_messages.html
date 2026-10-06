@@ -1,0 +1,13 @@
+{% load ui %}
+{% comment %}Flash messages from django.contrib.messages; behaviour in js/core/messages.js.{% endcomment %}
+{% if messages %}
+<div class="flash-stack" role="status" aria-live="polite">
+  {% for message in messages %}
+    <div class="flash flash--{{ message.level_tag|default:'info' }}">
+      <span class="flash__icon">{% if message.level_tag == 'success' %}{% icon "check" %}{% elif message.level_tag == 'info' or not message.level_tag %}{% icon "info" %}{% else %}{% icon "alert" %}{% endif %}</span>
+      <p class="flash__text">{{ message }}</p>
+      <button type="button" class="flash__close" aria-label="Dismiss message">{% icon "x" %}</button>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}

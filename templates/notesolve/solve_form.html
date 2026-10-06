@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static ui humanize %}
+{% block title %}Answer {{ solve_request.user|display_name }}{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/components/reader.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/notesolve.css' %}">{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'js/pages/file-preview.js' %}"></script>{% endblock %}
+
+{% block content %}
+<div class="wrap form-page solve-answer">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="{% url 'provider_solved_requests' %}">NoteSolve</a>{% icon "chev-right" %}<span aria-current="page">{{ solve_request.subject }} · {{ solve_request.topic }}</span>
+  </nav>
+
+  <div class="solve-answer__grid">
+    <article class="card card-pad question-card">
+      <div class="question-card__who">
+        {% avatar solve_request.user 44 %}
+        <div><strong class="ink">{{ solve_request.user|display_name }}</strong><span class="t-cap">asked {{ solve_request.created_at|naturaltime }}</span></div>
+      </div>
+      <h1 class="t-h2">{{ solve_request.subject }} · {{ solve_request.topic }}</h1>
+      <div class="cluster">
+        <span class="chip chip-line chip-sm">{{ solve_request.university }}</span>
+        <span class="chip chip-line chip-sm">{{ solve_request.department }}</span>
+        <span class="chip chip-line chip-sm">Year {{ solve_request.year }} · Semester {{ solve_request.semester }}</span>
+      </div>
+      <div class="question-card__text">{{ solve_request.problem_description|linebreaks }}</div>
+      {% if attached_files %}
+        <div class="stack" style="--stack: 8px">
+          <span class="label">Attached file{{ attached_files|length|pluralize }}</span>
+          <div class="cluster">
+            {% for file in attached_files %}<a class="btn btn-secondary btn-sm" href="{% url 'notesolve_file' file.id %}" target="_blank" rel="noopener" data-preview="{{ file.file.name|filename }}">{% icon "clip" size="sm" %}{{ file.file.name|cut:"notesolve_files/"|truncatechars:32 }}</a>{% endfor %}
+          </div>
+        </div>
+      {% else %}
+        <p class="t-cap">No file was attached by the requester.</p>
+      {% endif %}
+    </article>
+
+    <div class="stack" style="--stack: 20px">
+      <form class="card form-card" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="solve">
+        <h2 class="t-h3">Your solution</h2>
+        {% include "components/_form_errors.html" %}
+        {% include "components/_field.html" with field=form.solution_text label="Explanation" hint="Walk through the steps. The student sees this with your file." %}
+        {% include "components/_file_field.html" with field=form.file label="Worked solution (photo or PDF)" optional=True %}
+        <div class="form-actions"><button class="btn btn-primary" type="submit">{% icon "send" size="sm" %}Submit Solution</button></div>
+      </form>
+
+      <details class="card card-pad reject-panel">
+        <summary class="reject-panel__summary"><span class="t-small ink strong">Can’t help with this one?</span>{% icon "chev-down" size="sm" %}</summary>
+        <form class="stack" style="--stack: 12px; padding-top: 14px" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="reject">
+          <div class="field">
+            <label class="label" for="reject-reason">Reason</label>
+            <textarea class="input" id="reject-reason" name="reason" rows="3" required maxlength="1000" placeholder="e.g. This is outside my subject."></textarea>
+            <span class="hint">The student sees this and can send the question to another provider.</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" type="submit" style="align-self: flex-start">Turn down the request</button>
+        </form>
+      </details>
+    </div>
+  </div>
+</div>
+{% include "components/_file_preview.html" %}
+{% endblock %}

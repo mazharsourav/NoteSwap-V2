@@ -1,0 +1,61 @@
+/*
+  Flash messages (Django messages framework, js/core/messages.js): dark toasts, top right.
+  Success and info leave by themselves; warnings and errors stay until closed.
+  Inline notices (.notice) sit inside a page for information that should stay visible.
+*/
+.flash-stack {
+  position: fixed;
+  top: calc(var(--header-h) + 16px);
+  right: 16px;
+  z-index: var(--z-toast);
+  display: flex; flex-direction: column; gap: 10px;
+  width: min(400px, calc(100vw - 32px));
+  pointer-events: none;
+}
+.flash {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 14px 14px 16px;
+  border-radius: var(--r-lg);
+  background: var(--ink);
+  color: var(--white);
+  box-shadow: var(--shadow-pop);
+  pointer-events: auto;
+  animation: flash-in var(--t-med) var(--ease) both;
+}
+.flash.is-leaving { animation: flash-out var(--t-med) var(--ease) both; }
+@keyframes flash-in { from { opacity: 0; transform: translateY(-8px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes flash-out { to { opacity: 0; transform: translateX(16px); } }
+
+.flash__icon { display: inline-flex; padding-top: 1px; color: #6FDDB1; }
+.flash--warning .flash__icon, .flash--error .flash__icon { color: var(--white); }
+.flash--warning, .flash--error { box-shadow: var(--shadow-pop), inset 3px 0 0 var(--white); }
+.flash__text { flex-grow: 1; font-size: var(--fs-small); font-weight: 600; line-height: 1.5; padding-top: 1px; }
+.flash__close {
+  width: 26px; height: 26px; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0; border-radius: var(--r-sm);
+  background: none; color: #B8C4BE;
+}
+.flash__close:hover { background: rgba(255, 255, 255, .1); color: var(--white); }
+.flash__close .icon { width: 16px; height: 16px; }
+
+.notice {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 14px 16px;
+  border: 1px solid var(--green-200);
+  border-radius: var(--r-lg);
+  background: var(--green-50);
+  color: var(--ink);
+  font-size: var(--fs-small);
+}
+.notice > .icon { color: var(--green-700); margin-top: 1px; }
+.notice-gray { background: var(--surface); border-color: var(--line); }
+.notice-gray > .icon { color: var(--muted); }
+/* Something the user has to act on (e.g. a rejected note): no red, a dark edge and bold text instead */
+.notice-rejected { background: var(--white); border-color: var(--line-strong); box-shadow: inset 4px 0 0 var(--ink); }
+.notice-rejected > .icon { color: var(--ink); }
+.notice-rejected__reason { padding: 10px 14px; border-radius: var(--r-md); background: var(--surface); color: var(--ink); font-size: 15px; white-space: pre-line; overflow-wrap: anywhere; }
+
+@media (max-width: 600px) {
+  .flash-stack { top: auto; bottom: 16px; right: 16px; }
+}

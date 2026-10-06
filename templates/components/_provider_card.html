@@ -1,0 +1,22 @@
+{% load ui %}
+{% comment %}
+  A provider as a card. Usage:
+  {% include "components/_provider_card.html" with provider=item.provider note_count=item.note_count follower_count=item.follower_count %}
+  Uses `followed_ids` from the page context to show Follow / Following.
+{% endcomment %}
+<article class="card provider-card">
+  {% avatar provider 64 %}
+  <div class="provider-card__who">
+    <h3 class="t-h3"><a class="provider-card__name" href="{% url 'provider_profile' provider.id %}">{{ provider|display_name }}</a></h3>
+    <span class="t-small muted">{{ provider.university|uni_full|default:"University not set" }}</span>
+  </div>
+  <div class="provider-card__stats">
+    <span><strong>{{ note_count }}</strong> note{{ note_count|pluralize }}</span>
+    <span><strong>{{ follower_count }}</strong> follower{{ follower_count|pluralize }}</span>
+  </div>
+  {% if provider.id in followed_ids %}
+    {% include "components/_follow_button.html" with provider=provider is_following=True %}
+  {% else %}
+    {% include "components/_follow_button.html" with provider=provider is_following=False %}
+  {% endif %}
+</article>

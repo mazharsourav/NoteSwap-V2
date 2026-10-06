@@ -1,0 +1,18 @@
+{% load allauth ui %}{% comment %}A single field drawn by allauth itself (e.g. the email address list).{% endcomment %}
+{% if attrs.type == "radio" or attrs.type == "checkbox" %}
+<label class="choice-row" for="{{ attrs.id }}">
+  <input type="{{ attrs.type }}"{% if attrs.name %} name="{{ attrs.name }}"{% endif %}{% if attrs.id %} id="{{ attrs.id }}"{% endif %}{% if attrs.value is not None %} value="{{ attrs.value }}"{% endif %}{% if attrs.checked %} checked{% endif %}{% if attrs.required %} required{% endif %}{% if attrs.disabled %} disabled{% endif %}>
+  <span class="choice-row__label">{% slot label %}{% endslot %}</span>
+</label>
+{% else %}
+<div class="field{% if attrs.errors %} has-error{% endif %}">
+  <label class="label" for="{{ attrs.id }}">{% slot label %}{% endslot %}</label>
+  {% if attrs.type == "textarea" %}
+    <textarea class="input"{% if attrs.required %} required{% endif %}{% if attrs.rows %} rows="{{ attrs.rows }}"{% endif %}{% if attrs.disabled %} disabled{% endif %}{% if attrs.readonly %} readonly{% endif %}{% if attrs.name %} name="{{ attrs.name }}"{% endif %}{% if attrs.id %} id="{{ attrs.id }}"{% endif %}{% if attrs.placeholder %} placeholder="{{ attrs.placeholder }}"{% endif %}>{% slot value %}{% endslot %}</textarea>
+  {% else %}
+    <input class="input" type="{{ attrs.type }}"{% if attrs.required %} required{% endif %}{% if attrs.disabled %} disabled{% endif %}{% if attrs.readonly %} readonly{% endif %}{% if attrs.name %} name="{{ attrs.name }}"{% endif %}{% if attrs.id %} id="{{ attrs.id }}"{% endif %}{% if attrs.placeholder %} placeholder="{{ attrs.placeholder }}"{% endif %}{% if attrs.autocomplete %} autocomplete="{{ attrs.autocomplete }}"{% endif %}{% if attrs.value is not None %} value="{{ attrs.value }}"{% endif %}>
+  {% endif %}
+  {% if slots.help_text %}<span class="hint">{% slot help_text %}{% endslot %}</span>{% endif %}
+  {% for error in attrs.errors %}<span class="field-error">{% icon "alert" %}{{ error }}</span>{% endfor %}
+</div>
+{% endif %}

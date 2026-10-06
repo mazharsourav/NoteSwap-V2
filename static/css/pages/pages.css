@@ -1,0 +1,131 @@
+/* Static pages: Help Center and articles, About, Terms, Contact / Feedback / Ask a question. */
+
+/* Readable long text */
+.prose { display: flex; flex-direction: column; gap: 16px; max-width: 720px; min-width: 0; }
+.prose h2 { margin-top: 20px; font-size: 22px; line-height: 1.3; font-weight: 800; letter-spacing: -0.012em; scroll-margin-top: calc(var(--header-h) + 20px); }
+.prose p, .prose li { font-size: 17px; line-height: 1.7; color: var(--text); }
+.prose .t-lead { font-size: var(--fs-lead); }
+.prose .subject-card__icon { margin-bottom: 4px; }
+.steps { display: flex; flex-direction: column; gap: 12px; padding: 0; counter-reset: step; list-style: none; }
+.steps li { position: relative; padding-left: 40px; counter-increment: step; }
+.steps li::before {
+  content: counter(step);
+  position: absolute; left: 0; top: 2px;
+  width: 26px; height: 26px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--r-pill);
+  background: var(--green-50); color: var(--green-800);
+  font-size: 13px; font-weight: 900;
+}
+.article-links { padding-top: 16px; }
+
+.article-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 48px; align-items: start; }
+.article-layout > aside { position: sticky; top: calc(var(--header-h) + 24px); }
+@media (max-width: 960px) {
+  .article-layout { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .article-layout > aside { position: static; }
+  /* A table of contents belongs above the text it lists (Terms), not after it */
+  .article-layout--toc > aside { order: -1; }
+}
+
+.help-links { display: flex; flex-direction: column; gap: 4px; }
+.help-links a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; margin: 0 -10px; border-radius: var(--r-md); font-size: var(--fs-small); font-weight: 700; color: var(--text); }
+.help-links a:hover { background: var(--surface); color: var(--green-700); }
+.help-links .icon { color: var(--muted); }
+
+.toc ol { display: flex; flex-direction: column; gap: 8px; padding-left: 18px; font-size: var(--fs-small); }
+.toc a { color: var(--text); font-weight: 700; }
+.toc a:hover { color: var(--green-700); }
+
+/* Help Center */
+.help-hero { padding-block: clamp(48px, 7vw, 80px) 48px; background: var(--surface); border-bottom: 1px solid var(--line); text-align: center; }
+.help-hero__inner { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.help-search { width: min(600px, 100%); margin-top: 8px; }
+.help-search .input { height: 54px; border-radius: var(--r-lg); font-size: 16px; }
+/* Help topic cards in centred rows (4 / 3 / 2 / 1 across), so a short last row sits in the middle, not alone on the left */
+.help-grid { --cols: 4; display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+.help-grid > .help-card { flex: 0 0 calc((100% - (var(--cols) - 1) * 20px) / var(--cols)); min-width: 0; }
+@media (max-width: 1100px) { .help-grid { --cols: 3; } }
+@media (max-width: 780px) { .help-grid { --cols: 2; } }
+@media (max-width: 520px) { .help-grid { --cols: 1; } }
+.help-card { display: flex; flex-direction: column; gap: 10px; padding: 24px; }
+.help-card .link-arrow { margin-top: auto; padding-top: 6px; color: var(--green-700); }
+.help-card:hover .subject-card__icon { background: var(--green-700); color: var(--white); }
+/* Common questions: centred under the centred hero, same size as the Premium FAQ */
+.help-faq { display: flex; flex-direction: column; gap: 24px; max-width: 840px; margin: 0 auto; padding-top: var(--section-gap); }
+.help-faq > .t-h2 { text-align: center; }
+.help-faq .faq-item summary { padding: 20px 24px; font-size: 17px; }
+.help-faq .faq-item p { padding: 0 24px 20px; font-size: 15px; line-height: 1.65; color: var(--text); }
+.help-none { margin-top: 24px; }
+.help-contact {
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px 24px;
+  margin-top: var(--section-gap);
+  padding: 28px;
+  border-radius: var(--r-xl);
+  background: var(--green-50);
+  border: 1px solid var(--green-200);
+}
+
+/* About */
+.about-hero { padding-block: clamp(56px, 8vw, 104px) clamp(40px, 6vw, 72px); }
+.about-hero__inner { display: flex; flex-direction: column; gap: 20px; max-width: 820px; }
+/* Story and the value cards fill the page width: story on the left edge, cards on the right edge */
+.about-story { display: grid; grid-template-columns: minmax(0, 720px) 340px; justify-content: space-between; gap: 56px; align-items: start; }
+.about-story .prose h2 { margin-top: 0; }
+@media (max-width: 1000px) { .about-story { grid-template-columns: minmax(0, 1fr); gap: 32px; } }
+.about-values { display: flex; flex-direction: column; gap: 16px; }
+.value-card { display: flex; flex-direction: column; gap: 10px; padding: 22px; }
+
+/* Team: centred heading and cards */
+.about-team__head { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 36px; text-align: center; }
+.team-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; }
+/* Profile card: green cover, photo overlapping it, name, role, bio, three facts, link buttons */
+.team-card { width: min(360px, 100%); display: flex; flex-direction: column; align-items: center; padding: 10px 10px 24px; text-align: center; }
+.team-card__cover {
+  align-self: stretch; height: 120px; border-radius: var(--r-lg);
+  background:
+    radial-gradient(circle at var(--c1), rgba(255, 255, 255, .85) 0 38px, transparent 39px),
+    radial-gradient(circle at var(--c2), rgba(255, 255, 255, .6) 0 54px, transparent 55px),
+    radial-gradient(circle at var(--c3), var(--green-200) 0 46px, transparent 47px),
+    radial-gradient(rgba(11, 125, 87, .10) 1px, transparent 1.6px) 0 0 / 14px 14px,
+    linear-gradient(135deg, var(--green-50), var(--green-100));
+}
+.team-card--a .team-card__cover { --c1: 14% 118%; --c2: 30% 135%; --c3: 88% 8%; }
+.team-card--b .team-card__cover { --c1: 86% 118%; --c2: 68% 135%; --c3: 10% 4%; }
+.team-card__photo {
+  position: relative; width: 104px; height: 104px; margin-top: -52px; border-radius: var(--r-pill); object-fit: cover;
+  background: var(--green-100); box-shadow: 0 0 0 4px var(--white), 0 0 0 5px var(--line), 0 10px 24px rgba(10, 61, 44, .12);
+}
+.team-card__name { margin-top: 16px; font-size: 19px; line-height: 1.3; font-weight: 800; color: var(--ink); }
+.team-card__role { margin-top: 2px; font-size: var(--fs-cap); font-weight: 700; color: var(--green-700); }
+.team-card__bio { max-width: 32ch; margin-top: 10px; padding-inline: 12px; font-size: var(--fs-small); line-height: 1.6; color: var(--text); }
+.team-card__facts {
+  align-self: stretch; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 20px 8px 0; padding: 14px 4px;
+  border-radius: var(--r-lg); background: var(--surface);
+}
+.team-card__facts div { display: flex; flex-direction: column-reverse; gap: 2px; padding-inline: 6px; min-width: 0; }
+.team-card__facts div + div { border-left: 1px solid var(--line-strong); }
+.team-card__facts dd { margin: 0; font-size: 15px; font-weight: 800; color: var(--ink); overflow-wrap: anywhere; }
+.team-card__facts dt { font-size: 12px; color: var(--muted); }
+/* Up to 8 links on one line */
+.team-card .team-card__links { display: flex; justify-content: center; gap: 6px; margin-top: 20px; padding-inline: 4px; }
+.team-link {
+  width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line-strong); border-radius: var(--r-pill); color: var(--text); background: var(--white);
+  transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+.team-link:hover { color: var(--green-700); border-color: var(--green-700); background: var(--green-50); transform: translateY(-1px); }
+.team-link:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+@media (max-width: 380px) {
+  .team-card .team-card__links { gap: 4px; }
+  .team-link { width: 30px; height: 30px; }
+}
+
+/* Contact / Feedback / Ask a question */
+.message-page { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(32px, 5vw, 64px); align-items: start; padding-top: clamp(40px, 6vw, 72px); }
+@media (max-width: 900px) { .message-page { grid-template-columns: minmax(0, 1fr); } }
+.message-page__intro { display: flex; flex-direction: column; gap: 16px; }
+.message-page__aside { display: flex; flex-direction: column; gap: 16px; padding-top: 12px; }
+.message-page__aside li { display: flex; gap: 14px; align-items: flex-start; font-size: var(--fs-small); color: var(--text); }
+.message-page__aside li > .icon { color: var(--green-700); margin-top: 2px; }
+.message-page__aside strong { display: block; color: var(--ink); }

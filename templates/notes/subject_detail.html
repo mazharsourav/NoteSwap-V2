@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}{{ subject.name }}{% endblock %}
+{% block meta_description %}Verified {{ subject.name }} notes from university students in Bangladesh.{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/notes.css' %}">{% endblock %}
+
+{% block content %}
+<div class="wrap page-head">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="{% url 'subject_list' %}">Notes</a>{% icon "chev-right" %}<span aria-current="page">{{ subject.name }}</span>
+  </nav>
+  <div class="page-head__row subject-head">
+    <div class="page-head__text">
+      <h1 class="t-h1">{{ subject.name }}</h1>
+      <div class="cluster">
+        <span class="chip chip-gray">{{ total }} note{{ total|pluralize }}</span>
+        {% if universities %}<span class="chip chip-line">{{ universities|length }} universit{{ universities|length|pluralize:"y,ies" }}</span>{% endif %}
+      </div>
+    </div>
+    {% if user.user_type == 'provider' or user.is_superuser %}
+      <a class="btn btn-primary" href="{% url 'upload_note' %}?subject={{ subject.id }}{% if chosen_term %}&amp;term={{ chosen_term }}{% endif %}">{% icon "upload" size="sm" %}Upload a note</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="wrap section">
+  <div class="with-aside">
+    <div class="card list-card">
+      <form class="list-card__tools" method="get" role="search" data-autosubmit>
+        {% if chosen_term %}<input type="hidden" name="term" value="{{ chosen_term }}">{% endif %}
+        <div class="search">
+          {% icon "search" %}
+          <input class="input" type="search" name="q" value="{{ request.GET.q }}" placeholder="Filter by title, code or provider" aria-label="Filter by title, course code or provider">
+        </div>
+        {% if universities|length > 1 or chosen_university %}
+          {% include "notes/_university_filter.html" with picker_id="n-university" %}
+        {% endif %}
+        <label class="visually-hidden" for="n-sort">Sort</label>
+        <select class="input" id="n-sort" name="sort">
+          <option value="">Highest rated</option>
+          <option value="newest"{% if request.GET.sort == 'newest' %} selected{% endif %}>Newest</option>
+        </select>
+      </form>
+      <div class="list-card__chips">{% include "notes/_term_chips.html" %}</div>
+      {% if chosen_university or chosen_term %}
+        <p class="filter-note t-small">
+          {% icon "sliders" size="sm" %}<span>Showing <strong>{% if chosen_university %}{{ chosen_university|uni_short }}{% if chosen_term %} · {% endif %}{% endif %}{{ chosen_term }}</strong> notes</span>
+          <a href="{% url 'subject_detail' subject.id %}">Show all notes</a>
+        </p>
+      {% endif %}
+      {% if page.object_list %}
+        <ul class="note-rows">
+          {% for note in page %}{% include "notes/_note_row.html" %}{% endfor %}
+        </ul>
+      {% else %}
+        <div class="list-card__empty">
+          <div class="empty">
+            <span class="empty__icon">{% icon "file" %}</span>
+            {% if filtering %}
+              <span class="empty__title">{% if request.GET.q %}Nothing matches “{{ request.GET.q }}”{% else %}No notes match these filters{% endif %}</span>
+              <p>Try a different title, course code or provider, or remove a filter.</p>
+              <a class="btn btn-secondary btn-sm" href="{% url 'subject_detail' subject.id %}">Show all notes</a>
+            {% else %}
+              <span class="empty__title">No notes in {{ subject.name }} yet</span>
+              <p>Notes appear here as soon as a moderator approves them.</p>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+      <div class="list-card__foot t-small muted">{% if filtering %}{{ page.paginator.count }} of {{ total }} notes · <a href="{% url 'subject_detail' subject.id %}">Clear filters</a>{% else %}{{ total }} note{{ total|pluralize }} in {{ subject.name }}{% endif %}</div>
+    </div>
+
+    <aside class="stack" style="--stack: 20px">
+      {% include "notes/_top_notes.html" with top_notes=newest_notes title="Newest in "|add:subject.name plain=True %}
+      {% include "notes/_provider_cta.html" with what=subject.name subject_id=subject.id %}
+    </aside>
+  </div>
+  {% include "components/_pagination.html" %}
+</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% load ui %}{% comment %}Add / edit a Premium package. Expects: form, title, submit.{% endcomment %}
+<nav class="crumbs" aria-label="Breadcrumb">
+  <a href="{% url 'manage_premium' %}">Premium</a>{% icon "chev-right" %}<span aria-current="page">{{ title }}</span>
+</nav>
+<form class="card form-card manage-form" method="post">
+  {% csrf_token %}
+  <div class="form-page__head"><h1 class="t-h2">{{ title }}</h1><p class="t-small muted">Students see the name, price, length and description on the Premium page.</p></div>
+  {% include "components/_form_errors.html" %}
+  {% include "components/_field.html" with field=form.name label="Package name" hint="e.g. “Semester” or “Monthly”." %}
+  <div class="field-row">
+    {% include "components/_field.html" with field=form.price label="Price (৳)" %}
+    {% include "components/_field.html" with field=form.duration_in_months label="Length in months" %}
+  </div>
+  {% include "components/_field.html" with field=form.description hint="What students get. One or two short sentences." %}
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit">{{ submit }}</button>
+    <a class="btn btn-ghost is-plain" href="{% url 'manage_premium' %}">Cancel</a>
+  </div>
+</form>

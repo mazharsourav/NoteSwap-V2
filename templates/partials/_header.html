@@ -1,0 +1,135 @@
+{% load i18n ui %}
+{% comment %}
+  Site header, account dropdown and phone menu (behaviour in js/core/nav.js).
+  Roles: providers upload and answer NoteSolve requests; Premium students use NoteSolve;
+  moderators and superusers see Manage; basic students without Premium see the Premium link.
+{% endcomment %}
+<header class="site-header" data-header>
+  <div class="wrap site-header__inner">
+    {% include "partials/_brand.html" %}
+
+    <nav class="site-nav" aria-label="{% translate "Main" %}">
+      <a class="site-nav__link{% if nav_section == 'notes' %} is-active{% endif %}"{% if nav_section == 'notes' %} aria-current="page"{% endif %} href="{% url 'subject_list' %}">{% translate "Notes" %}</a>
+      <a class="site-nav__link{% if nav_section == 'providers' %} is-active{% endif %}"{% if nav_section == 'providers' %} aria-current="page"{% endif %} href="{% url 'providers' %}">{% translate "Providers" %}</a>
+      {% if not user.is_authenticated %}
+        <a class="site-nav__link{% if nav_section == 'about' %} is-active{% endif %}"{% if nav_section == 'about' %} aria-current="page"{% endif %} href="{% url 'about' %}">{% translate "About" %}</a>
+      {% else %}
+        {% if user.user_type == 'provider' %}
+          <a class="site-nav__link{% if nav_section == 'notesolve' %} is-active{% endif %}"{% if nav_section == 'notesolve' %} aria-current="page"{% endif %} href="{% url 'provider_solved_requests' %}">NoteSolve</a>
+        {% elif is_premium_user %}
+          <a class="site-nav__link{% if nav_section == 'notesolve' %} is-active{% endif %}"{% if nav_section == 'notesolve' %} aria-current="page"{% endif %} href="{% url 'notesolve_dashboard' %}">NoteSolve</a>
+        {% elif user.user_type == 'basic' and not user.is_superuser %}
+          <a class="site-nav__link{% if nav_section == 'premium' %} is-active{% endif %}"{% if nav_section == 'premium' %} aria-current="page"{% endif %} href="{% url 'premium_packages' %}">{% translate "Premium" %}</a>
+        {% endif %}
+        {% if user.is_superuser or user.user_type == 'moderator' %}
+          <a class="site-nav__link{% if nav_section == 'manage' %} is-active{% endif %}"{% if nav_section == 'manage' %} aria-current="page"{% endif %} href="{% url 'Manage' %}">{% translate "Manage" %}</a>
+        {% endif %}
+      {% endif %}
+    </nav>
+
+    <div class="site-header__actions">
+      {% if user.is_authenticated %}
+        <a class="btn btn-ghost btn-icon header-icon header-search" href="{% url 'search' %}" aria-label="{% translate "Search notes" %}" title="{% translate "Search notes" %}">{% icon "search" %}</a>
+        {% if user.user_type == 'provider' or user.is_superuser %}
+          <a class="btn btn-soft btn-sm header-upload" href="{% url 'upload_note' %}">{% icon "plus" size="sm" %}{% translate "Upload" %}</a>
+        {% endif %}
+        <a class="btn btn-ghost btn-icon header-icon notif-bell" href="{% url 'notifications' %}"
+           aria-label="Notifications{% if unread_notifications %}, {{ unread_notifications }} unread{% endif %}" title="{% translate "Notifications" %}">
+          {% icon "bell" %}{% if unread_notifications %}<span class="notif-badge">{% if unread_notifications > 99 %}99+{% else %}{{ unread_notifications }}{% endif %}</span>{% endif %}
+        </a>
+        {% if is_premium_user %}<span class="chip chip-deep chip-sm premium-chip">{% icon "crown" %}{% translate "Premium" %}</span>{% endif %}
+
+        <div class="account-menu" data-dropdown>
+          <button type="button" class="account-menu__toggle" data-dropdown-toggle aria-expanded="false" aria-controls="account-menu-panel">
+            {% avatar user 36 %}<span class="visually-hidden">{% translate "Account menu" %}</span>{% icon "chev-down" size="sm" %}
+          </button>
+          <div class="dropdown__panel account-menu__panel" id="account-menu-panel" data-dropdown-panel hidden>
+            <div class="account-menu__who">
+              {% avatar user 40 %}
+              <span class="account-menu__name"><strong>{{ user|display_name }}</strong><span class="t-cap">{{ user.email|default:user.username }}</span></span>
+            </div>
+            <a class="menu-item" href="{% url 'profile' %}">{% icon "user" %}{% translate "Your profile" %}</a>
+            <a class="menu-item" href="{% url 'following' %}">{% icon "users" %}{% translate "Following" %}</a>
+            <a class="menu-item" href="{% url 'notifications' %}">{% icon "bell" %}Notifications{% if unread_notifications %}<span class="count count-g">{{ unread_notifications }}</span>{% endif %}</a>
+            {% if user.user_type == 'provider' %}
+              <a class="menu-item" href="{% url 'upload_note' %}">{% icon "upload" %}{% translate "Upload a note" %}</a>
+              <a class="menu-item" href="{% url 'provider_solved_requests' %}">{% icon "inbox" %}{% translate "NoteSolve requests" %}</a>
+            {% endif %}
+            {% if user.is_superuser or user.user_type == 'moderator' %}
+              <a class="menu-item" href="{% url 'Manage' %}">{% icon "grid" %}{% translate "Manage" %}</a>
+            {% endif %}
+            {% if user.user_type == 'basic' and not user.is_superuser and not is_premium_user %}
+              <a class="menu-item" href="{% url 'premium_packages' %}">{% icon "crown" %}{% translate "Get Premium" %}</a>
+            {% endif %}
+            <div class="menu-sep"></div>
+            <a class="menu-item" href="{% url 'edit_profile' %}">{% icon "edit" %}{% translate "Edit profile" %}</a>
+            <a class="menu-item" href="{% url 'account_change_password' %}">{% icon "lock" %}{% translate "Password & security" %}</a>
+            <div class="menu-sep"></div>
+            <a class="menu-item" href="{% url 'logout' %}" data-post-url="{% url 'logout' %}">{% icon "logout" %}{% translate "Sign out" %}</a>
+          </div>
+        </div>
+        <a class="header-avatar" href="{% url 'profile' %}" aria-label="{% translate "Your profile" %}">{% avatar user 32 %}</a>
+      {% else %}
+        <a class="btn btn-ghost is-plain" href="{% url 'account_login' %}">{% translate "Sign in" %}</a>
+        <a class="btn btn-primary btn-sm header-signup" href="{% url 'account_signup' %}">{% translate "Create account" %}</a>
+      {% endif %}
+      <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-open aria-controls="mobile-menu" aria-expanded="false" aria-label="{% translate "Open menu" %}">{% icon "menu" %}</button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="{% translate "Menu" %}" hidden>
+  <div class="mobile-menu__top">
+    {% include "partials/_brand.html" with small=True %}
+    <button type="button" class="btn btn-ghost btn-icon is-plain" data-menu-close aria-label="{% translate "Close menu" %}">{% icon "x" %}</button>
+  </div>
+  <div class="mobile-menu__body">
+    {% if user.is_authenticated %}
+      <div class="card mobile-menu__user motion-item">
+        {% avatar user 44 %}
+        <span class="mobile-menu__name"><strong>{{ user|display_name }}</strong><span class="t-cap">{{ user.university|uni_short|default:user.username }}</span></span>
+        <a class="btn btn-secondary btn-sm" href="{% url 'profile' %}">{% translate "Profile" %}</a>
+      </div>
+    {% endif %}
+    <form class="search motion-item" style="--i: 1" role="search" action="{% url 'search' %}" method="get">
+      {% icon "search" %}
+      <input class="input" type="search" name="q" placeholder="{% translate "Search notes" %}" aria-label="{% translate "Search notes" %}">
+    </form>
+    <nav class="mobile-menu__nav" aria-label="{% translate "Main" %}">
+      <a class="mobile-menu__link motion-item{% if nav_section == 'notes' %} is-active{% endif %}" style="--i: 2" href="{% url 'subject_list' %}">{% icon "book" %}<span>{% translate "Notes" %}</span></a>
+      <a class="mobile-menu__link motion-item{% if nav_section == 'providers' %} is-active{% endif %}" style="--i: 3" href="{% url 'providers' %}">{% icon "users" %}<span>{% translate "Providers" %}</span></a>
+      {% if user.is_authenticated %}
+        {% if user.user_type == 'provider' %}
+          <a class="mobile-menu__link motion-item" style="--i: 4" href="{% url 'upload_note' %}">{% icon "upload" %}<span>{% translate "Upload a note" %}</span></a>
+          <a class="mobile-menu__link motion-item{% if nav_section == 'notesolve' %} is-active{% endif %}" style="--i: 5" href="{% url 'provider_solved_requests' %}">{% icon "inbox" %}<span>{% translate "NoteSolve requests" %}</span></a>
+        {% elif is_premium_user %}
+          <a class="mobile-menu__link motion-item{% if nav_section == 'notesolve' %} is-active{% endif %}" style="--i: 4" href="{% url 'notesolve_dashboard' %}">{% icon "message" %}<span>NoteSolve</span><span class="chip chip-deep chip-sm">{% translate "Premium" %}</span></a>
+        {% elif user.user_type == 'basic' and not user.is_superuser %}
+          <a class="mobile-menu__link motion-item{% if nav_section == 'premium' %} is-active{% endif %}" style="--i: 4" href="{% url 'premium_packages' %}">{% icon "crown" %}<span>{% translate "Premium" %}</span></a>
+        {% endif %}
+        {% if user.is_superuser or user.user_type == 'moderator' %}
+          <a class="mobile-menu__link motion-item{% if nav_section == 'manage' %} is-active{% endif %}" style="--i: 6" href="{% url 'Manage' %}">{% icon "grid" %}<span>{% translate "Manage" %}</span></a>
+        {% endif %}
+        <a class="mobile-menu__link motion-item" style="--i: 7" href="{% url 'notifications' %}">{% icon "bell" %}<span>{% translate "Notifications" %}</span>{% if unread_notifications %}<span class="count count-g">{{ unread_notifications }}</span>{% endif %}</a>
+        <a class="mobile-menu__link motion-item" style="--i: 8" href="{% url 'following' %}">{% icon "users" %}<span>{% translate "Following" %}</span></a>
+      {% else %}
+        <a class="mobile-menu__link motion-item" style="--i: 4" href="{% url 'premium_packages' %}">{% icon "crown" %}<span>{% translate "Premium" %}</span></a>
+        <a class="mobile-menu__link motion-item" style="--i: 5" href="{% url 'about' %}">{% icon "info" %}<span>{% translate "About" %}</span></a>
+      {% endif %}
+    </nav>
+    <div class="mobile-menu__foot">
+      <div class="mobile-menu__links">
+        <a class="flink" href="{% url 'help_center' %}">{% translate "Help Center" %}</a>
+        {% if user.is_authenticated %}<a class="flink" href="{% url 'about' %}">{% translate "About" %}</a>{% endif %}
+        <a class="flink" href="{% url 'contact' %}">{% translate "Contact" %}</a>
+        <a class="flink" href="{% url 'terms_of_use' %}">{% translate "Terms of use" %}</a>
+      </div>
+      {% if user.is_authenticated %}
+        <a class="btn btn-secondary btn-block" href="{% url 'logout' %}" data-post-url="{% url 'logout' %}">{% icon "logout" size="sm" %}{% translate "Sign out" %}</a>
+      {% else %}
+        <a class="btn btn-primary btn-block" href="{% url 'account_signup' %}">{% translate "Create account" %}</a>
+        <a class="btn btn-secondary btn-block" href="{% url 'account_login' %}">{% translate "Sign in" %}</a>
+      {% endif %}
+    </div>
+  </div>
+</div>

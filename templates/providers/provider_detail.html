@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}{{ provider|display_name }}{% endblock %}
+{% block meta_description %}Verified notes by {{ provider|display_name }}{% if provider.university %}, {{ provider.university|uni_full }}{% endif %}.{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/account.css' %}">{% endblock %}
+
+{% block content %}
+<section class="person-head person-head--provider">
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Breadcrumb" style="padding-top: 28px">
+      <a href="{% url 'providers' %}">Providers</a>{% icon "chev-right" %}<span aria-current="page">{{ provider|display_name }}</span>
+    </nav>
+    <div class="person-head__inner">
+      {% avatar provider 104 %}
+      <div class="person-head__text">
+        <div class="cluster">
+          <h1 class="t-h1">{{ provider|display_name }}</h1>
+          <span class="chip">{% icon "shield" %}Provider</span>
+        </div>
+        <p class="muted">{% if provider.department %}{{ provider.department }}, {% endif %}{{ provider.university|uni_full|default:"University not set" }}</p>
+        <dl class="person-stats">
+          <div><dt>note{{ note_count|pluralize }}</dt><dd>{{ note_count }}</dd></div>
+          <div><dt>follower{{ follower_count|pluralize }}</dt><dd>{{ follower_count }}</dd></div>
+          {% if average_rating %}<div><dt>average rating</dt><dd>{{ average_rating|floatformat:1 }}</dd></div>{% endif %}
+        </dl>
+      </div>
+      <div class="person-head__actions">
+        {% include "components/_follow_button.html" with provider=provider is_following=is_following %}
+        {% if can_ask %}
+          <a class="btn btn-secondary btn-sm" href="{% url 'notesolve_dashboard' %}?provider={{ provider.id }}#ask">{% icon "message" size="sm" %}Ask on NoteSolve</a>
+        {% elif user.is_authenticated and user.user_type == 'basic' and not user.is_superuser and user != provider %}
+          <a class="btn btn-ghost btn-sm" href="{% url 'premium_packages' %}">{% icon "crown" size="sm" %}Ask on NoteSolve</a>
+        {% endif %}
+      </div>
+    </div>
+    <nav class="tabs" aria-label="Provider sections">
+      <a class="tab{% if tab == 'notes' %} is-active" aria-current="page{% endif %}" href="{% url 'provider_profile' provider.id %}">Notes <span class="count">{{ note_count }}</span></a>
+      <a class="tab{% if tab == 'about' %} is-active" aria-current="page{% endif %}" href="?tab=about">About</a>
+    </nav>
+  </div>
+</section>
+
+<div class="wrap section" style="padding-top: 32px">
+  {% if tab == 'about' %}
+    <section class="card card-pad about-card">
+      <h2 class="t-h3">About {{ provider.first_name|default:provider.username }}</h2>
+      <dl class="details details--grid about-card__details">
+        <div><dt>University</dt><dd>{{ provider.university|uni_full|default:"Not set" }}</dd></div>
+        <div><dt>Department</dt><dd>{{ provider.department|default:"Not set" }}</dd></div>
+        <div><dt>City</dt><dd>{{ provider.city|default:"Not set" }}</dd></div>
+        <div><dt>Provider since</dt><dd>{{ provider.date_joined|date:"F Y" }}</dd></div>
+      </dl>
+    </section>
+  {% else %}
+    {% if subjects|length > 1 %}
+      <div class="filter-chips">
+        <a class="chip{% if request.GET.subject %} chip-line{% endif %}" href="{% url 'provider_profile' provider.id %}">All</a>
+        {% for subject in subjects %}
+          <a class="chip{% if request.GET.subject != subject.id|stringformat:'s' %} chip-line{% endif %}" href="?subject={{ subject.id }}">{{ subject.name }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <div class="grid grid-notes" data-reveal-stagger>
+      {% for note in notes %}
+        {% include "components/_note_card.html" %}
+      {% empty %}
+        <div class="empty">
+          <span class="empty__icon">{% icon "file" %}</span>
+          <span class="empty__title">No published notes yet</span>
+          <p>Follow {{ provider.first_name|default:provider.username }} to hear when the first one goes live.</p>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

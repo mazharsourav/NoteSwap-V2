@@ -1,0 +1,18 @@
+{% load ui %}{% comment %}
+  One form field: label, control, help text and errors.
+  Usage: {% include "components/_field.html" with field=form.name %}
+  Optional: hint="..." (shown instead of the field's help_text), label="..." (overrides the label).
+{% endcomment %}{% if field.widget_type == 'checkbox' %}
+<div class="field{% if field.errors %} has-error{% endif %}">
+  <label class="check">{{ field }}{{ label|default:field.label }}</label>
+  {% if hint or field.help_text %}<span class="hint">{{ hint|default:field.help_text }}</span>{% endif %}
+  {% for error in field.errors %}<span class="field-error">{% icon "alert" %}{{ error }}</span>{% endfor %}
+</div>
+{% else %}
+<div class="field{% if field.errors %} has-error{% endif %}">
+  <label class="label" for="{{ field.id_for_label }}">{{ label|default:field.label }}{% if not field.field.required %} <span class="optional">(optional)</span>{% endif %}</label>
+  {{ field }}
+  {% if hint or field.help_text %}<span class="hint" id="{{ field.auto_id }}_helptext">{{ hint|default:field.help_text }}</span>{% endif %}
+  {% for error in field.errors %}<span class="field-error">{% icon "alert" %}{{ error }}</span>{% endfor %}
+</div>
+{% endif %}

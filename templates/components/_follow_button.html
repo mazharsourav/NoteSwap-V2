@@ -1,0 +1,25 @@
+{% load ui %}
+{% comment %}
+  Follow / unfollow a provider.
+  Usage: {% include "components/_follow_button.html" with provider=some_user is_following=bool %}
+  Signed-out visitors get a sign-in link that comes back to this page. Nothing shows on your own profile.
+{% endcomment %}
+{% with name=provider|display_name %}
+{% if not user.is_authenticated %}
+  <a href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}" class="btn btn-secondary btn-sm follow-btn">{% icon "plus" size="sm" %}Follow</a>
+{% elif user.id != provider.id %}
+  {% if is_following %}
+    <form method="post" action="{% url 'unfollow_provider' provider.id %}?next={{ request.get_full_path|urlencode }}" class="follow-form">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-soft btn-sm follow-btn follow-btn--following" aria-label="Unfollow {{ name }}">
+        <span class="follow-btn__state">{% icon "check" size="sm" %} Following</span><span class="follow-btn__hover">Unfollow</span>
+      </button>
+    </form>
+  {% else %}
+    <form method="post" action="{% url 'follow_provider' provider.id %}?next={{ request.get_full_path|urlencode }}" class="follow-form">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-secondary btn-sm follow-btn" aria-label="Follow {{ name }}">{% icon "plus" size="sm" %}Follow</button>
+    </form>
+  {% endif %}
+{% endif %}
+{% endwith %}

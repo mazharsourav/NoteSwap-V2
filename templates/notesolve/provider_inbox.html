@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static ui humanize %}
+{% block title %}NoteSolve requests{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/notesolve.css' %}">{% endblock %}
+
+{% block content %}
+<section class="browse-head solve-head">
+  <div class="wrap page-head__row">
+    <div class="page-head__text">
+      <span class="eyebrow">NoteSolve</span>
+      <h1 class="t-h1">Questions for you</h1>
+      <p class="muted">Premium students send you problems they’re stuck on. Answer with a written solution and a file, or say why you can’t take it.</p>
+    </div>
+    <dl class="solve-stats">
+      <div><dt>waiting</dt><dd>{{ received_requests|length }}</dd></div>
+      <div><dt>solved</dt><dd>{{ solved_requests|length }}</dd></div>
+    </dl>
+  </div>
+</section>
+
+<div class="wrap section stack" style="--stack: 32px; padding-top: 32px">
+  <section class="stack" style="--stack: 14px" aria-labelledby="waiting-title">
+    <h2 class="t-h3" id="waiting-title">Waiting for you <span class="count{% if received_requests %} count-g{% endif %}">{{ received_requests|length }}</span></h2>
+    {% if received_requests %}
+      <ul class="card inbox-rows">
+        {% for req in received_requests %}
+          <li>
+            <a class="inbox-row" href="{% url 'solve_request' req.id %}">
+              {% avatar req.user 40 %}
+              <span class="inbox-row__text">
+                <span class="t-small ink"><strong>{{ req.user|display_name }}</strong> asked about <strong>{{ req.subject }}</strong> · {{ req.topic }}</span>
+                <span class="t-cap">{{ req.problem_description|truncatechars:110 }}</span>
+              </span>
+              <span class="inbox-row__side"><span class="t-cap">{{ req.created_at|naturaltime }}</span><span class="link-arrow">Answer{% icon "arrow" size="sm" %}</span></span>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty"><span class="empty__icon">{% icon "inbox" %}</span><span class="empty__title">You currently have no pending requests.</span><p>New questions from Premium students show up here.</p></div>
+    {% endif %}
+  </section>
+
+  <section class="stack" style="--stack: 14px" aria-labelledby="solved-title">
+    <h2 class="t-h3" id="solved-title">Your solutions</h2>
+    {% if solved_requests %}
+      <ul class="card inbox-rows">
+        {% for solve in solved_requests %}
+          <li class="inbox-row">
+            {% avatar solve.solve_request.user 40 cls="is-alt" %}
+            <span class="inbox-row__text">
+              <span class="t-small ink">For <strong>{{ solve.solve_request.user|display_name }}</strong> · {{ solve.solve_request.subject }} · {{ solve.solve_request.topic }}</span>
+              <span class="t-cap">Sent {{ solve.submitted_at|naturaltime }}</span>
+            </span>
+            <span class="inbox-row__side">{% if solve.rating %}{% stars solve.rating 14 %}{% else %}<span class="t-cap">Not rated yet</span>{% endif %}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="t-small muted">You haven't solved any requests yet.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

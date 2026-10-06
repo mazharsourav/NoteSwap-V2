@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}{{ article.title }} · Help{% endblock %}
+{% block meta_description %}{{ article.summary }}{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/pages.css' %}">{% endblock %}
+
+{% block content %}
+<div class="wrap page-head">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="{% url 'help_center' %}">Help Center</a>{% icon "chev-right" %}<span aria-current="page">{{ article.title }}</span>
+  </nav>
+</div>
+
+<div class="wrap section article-layout">
+  <article class="prose">
+    <span class="subject-card__icon">{% icon article.icon %}</span>
+    <h1 class="t-h1">{{ article.title }}</h1>
+    <p class="t-lead">{{ article.summary }}</p>
+    {% for heading, blocks in sections %}
+      <h2>{{ heading }}</h2>
+      {% for block in blocks %}
+        {% if block.steps %}
+          <ol class="steps">{% for step in block.steps %}<li>{{ step }}</li>{% endfor %}</ol>
+        {% else %}
+          <p>{{ block.text }}</p>
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+    {% if article.links %}
+      <div class="cluster article-links">
+        {% for label, name in article.links %}<a class="btn btn-secondary btn-sm" href="{% url name %}">{{ label }}{% icon "arrow" size="sm" cls="icon-arrow" %}</a>{% endfor %}
+      </div>
+    {% endif %}
+  </article>
+
+  <aside class="stack" style="--stack: 16px">
+    <div class="card side-card">
+      <h2 class="side-card__title">More help</h2>
+      <ul class="help-links">
+        {% for other in others %}<li><a href="{% url 'help_article' other.slug %}">{% icon other.icon size="sm" %}{{ other.title }}</a></li>{% endfor %}
+      </ul>
+    </div>
+    <div class="card side-card side-card--green">
+      <h2 class="t-h3">Didn’t find your answer?</h2>
+      <p class="t-small">We reply by email, usually within a day or two.</p>
+      <a class="link-arrow" href="{% url 'ask_question' %}">Ask a question{% icon "arrow" size="sm" %}</a>
+    </div>
+  </aside>
+</div>
+{% endblock %}

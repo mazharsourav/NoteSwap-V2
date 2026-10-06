@@ -1,0 +1,4 @@
+{% extends "emails/_base.txt" %}{% block content %}Your {{ purchase.package_name }} order is approved. Premium is active until {{ user.premium_until|date:"j M Y" }}.
+
+Ask a provider on NoteSolve:
+{{ link }}{% endblock %}

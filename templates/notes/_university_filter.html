@@ -1,0 +1,12 @@
+{% comment %}
+  The university filter: a <select> that js/core/university.js turns into a type-to-search box.
+  A plain list of the universities that have notes here, after "All universities".
+  Expects: picker_id, universities, chosen_university (views.notes._filters()).
+{% endcomment %}
+<div class="uni-picker uni-picker--filter" data-uni-picker data-uni-filter>
+  <label class="visually-hidden" for="{{ picker_id }}">University</label>
+  <select class="input" id="{{ picker_id }}" name="university">
+    <option value="">All universities</option>
+    {% for value, label in universities %}<option value="{{ value }}"{% if chosen_university == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+</div>

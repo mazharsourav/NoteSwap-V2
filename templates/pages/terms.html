@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}Terms of use{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/pages.css' %}">{% endblock %}
+
+{% block content %}
+<div class="wrap page-head">
+  <div class="page-head__text">
+    <span class="eyebrow">Legal</span>
+    <h1 class="t-h1">Terms of use</h1>
+    <p class="muted">Last updated: October 2026</p>
+  </div>
+</div>
+
+<div class="wrap section article-layout article-layout--toc">
+  <article class="prose">
+    <p>These Terms of use (“Terms”) govern your access to and use of NoteSwap (“we”, “our”, or “the Platform”), a web platform for sharing and accessing academic resources. By registering with, browsing or using NoteSwap in any way, you confirm that you have read, understood and agree to these Terms.</p>
+
+    <h2 id="use">Use of the Platform</h2>
+    <p>NoteSwap is for students, educators and academic contributors who want to upload, share and explore academic content such as class notes, study guides and subject material. By using the Platform you confirm that you are at least 13 years old and able to enter into binding agreements, and you agree to follow all applicable laws and regulations.</p>
+
+    <h2 id="account">Your account</h2>
+    <p>Some features need an account. You are responsible for keeping your sign-in details private and for everything done with your account. The information you give us must be accurate and complete. Misrepresentation, impersonation or fraudulent details may lead to your account being suspended or closed.</p>
+
+    <h2 id="content">Content and intellectual property</h2>
+    <p>By uploading content to NoteSwap, you confirm that you own it or have permission to share it. You keep ownership of your content, but give NoteSwap a non-exclusive, royalty-free, worldwide licence to host, display and distribute it on the Platform, only to provide the service. Sharing copyrighted material without permission, plagiarism, and misleading or harmful material are not allowed and may be removed.</p>
+
+    <h2 id="conduct">Prohibited conduct</h2>
+    <p>Be respectful and honest. Spamming, hacking, harassment, scraping data, spreading malicious software, abuse and discriminatory language are not allowed and may lead to your account being closed without notice.</p>
+
+    <h2 id="privacy">Privacy and data</h2>
+    <p>We collect only what we need to run NoteSwap: your account details, the notes you upload, and your ratings, comments and follows. We do not sell your personal data. By using the Platform you agree to this use of your information.</p>
+
+    <h2 id="changes">Changes to these Terms</h2>
+    <p>We may update these Terms. Changes take effect when they are posted here, and continuing to use the Platform means you accept them, so please check this page from time to time.</p>
+
+    <h2 id="termination">Termination</h2>
+    <p>We may suspend or close your access if you break these Terms, violate the rights of other users, or harm the Platform or its community.</p>
+
+    <h2 id="contact">Contact</h2>
+    <p>Questions about these Terms? Send us a message through the <a href="{% url 'contact' %}">Contact page</a>.</p>
+  </article>
+
+  <aside>
+    <nav class="card side-card toc" aria-label="On this page">
+      <h2 class="side-card__title">On this page</h2>
+      <ol>
+        <li><a href="#use">Use of the Platform</a></li>
+        <li><a href="#account">Your account</a></li>
+        <li><a href="#content">Content and intellectual property</a></li>
+        <li><a href="#conduct">Prohibited conduct</a></li>
+        <li><a href="#privacy">Privacy and data</a></li>
+        <li><a href="#changes">Changes to these Terms</a></li>
+        <li><a href="#termination">Termination</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ol>
+    </nav>
+  </aside>
+</div>
+{% endblock %}

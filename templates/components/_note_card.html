@@ -1,0 +1,26 @@
+{% load ui %}
+{% comment %}
+  A published note as a card. The whole card is the link.
+  Needs: note (with subject and provider selected), note.avg_rating, note.rating_count.
+{% endcomment %}
+<a class="card lift note-card" href="{% url 'note_detail' note.id %}">
+  <div class="note-card__thumb" aria-hidden="true">
+    {% include "components/_note_cover.html" %}
+    <span class="chip chip-line chip-sm note-card__type">{% if note.note_type == 'image' %}{% icon "image" %}Image{% else %}{% icon "file" %}PDF{% endif %}</span>
+  </div>
+  <div class="note-card__body">
+    <div class="note-card__tags">
+      <span class="chip chip-sm">{{ note.subject.name }}</span>
+      <span class="chip chip-gray chip-sm" title="{{ note.university|uni_full }}">{{ note.university|uni_short|truncatechars:18 }}{% if note.course_code %} · {{ note.course_code }}{% endif %}</span>
+    </div>
+    <h3 class="t-h3 note-card__title">{{ note.name }}</h3>
+    <div class="note-card__foot">
+      <span class="note-card__by">{% avatar note.provider 26 %}<span>{{ note.provider|display_name }}</span></span>
+      {% if note.rating_count %}
+        <span class="rating"><span class="visually-hidden">Rated </span>{% icon "star" cls="star is-on" %}{{ note.avg_rating|floatformat:1 }}<span class="visually-hidden"> out of 5</span><span class="rating__count">({{ note.rating_count }}<span class="visually-hidden"> rating{{ note.rating_count|pluralize }}</span>)</span></span>
+      {% else %}
+        <span class="t-cap">No ratings yet</span>
+      {% endif %}
+    </div>
+  </div>
+</a>

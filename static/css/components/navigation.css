@@ -1,0 +1,99 @@
+/* In-page navigation: tabs, breadcrumbs, pagination, dropdown menus. */
+
+.tabs { display: flex; gap: 26px; overflow-x: auto; border-bottom: 1px solid var(--line); scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 2px;
+  font-size: 15px; font-weight: 800; line-height: 1;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.tab::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+  height: 2px; border-radius: 2px; background: var(--green-500);
+  transform: scaleX(0); transition: transform var(--t-med) var(--ease);
+}
+.tab:hover { color: var(--ink); }
+.tab.is-active { color: var(--ink); }
+.tab.is-active::after { transform: scaleX(1); }
+
+.crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: var(--fs-small); color: var(--muted); }
+.crumbs a { color: var(--text); font-weight: 700; }
+.crumbs a:hover { color: var(--green-700); }
+.crumbs .icon { width: 16px; height: 16px; color: #A3AEA8; }
+
+.pagination { display: flex; align-items: center; justify-content: center; gap: 6px; padding-top: 40px; }
+.pagination .btn-icon { color: var(--text); }
+.page-num {
+  min-width: 36px; height: 36px; padding: 0 6px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 9px;
+  font-size: 14px; font-weight: 800; color: var(--text);
+}
+.page-num:hover { background: var(--surface); color: var(--ink); }
+.page-num.is-current { background: var(--green-700); color: var(--white); }
+.page-gap { color: var(--muted); padding: 0 4px; }
+
+/* Sidebar links (account and Manage sidebars) */
+.sidelink {
+  display: flex; align-items: center; gap: 12px;
+  height: 42px; padding: 0 12px;
+  border-radius: var(--r-md);
+  font-size: 15px; font-weight: 700; color: var(--text);
+  transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.sidelink > span:first-of-type { flex-grow: 1; }
+.sidelink .icon { color: var(--muted); }
+.sidelink:hover { background: var(--surface); color: var(--ink); }
+.sidelink.is-active { background: var(--green-50); color: var(--green-800); }
+.sidelink.is-active .icon { color: var(--green-700); }
+
+/* Sidebar as a dropdown on phones (js/core/nav.js): the toggle shows the current page; the list opens below it.
+   Each page switches it on in its own phone breakpoint (account.css, manage.css). */
+.side-menu__list { display: flex; flex-direction: column; gap: 2px; }
+.side-menu__toggle {
+  display: none; align-items: center; gap: 12px;
+  width: 100%; height: 46px; padding: 0 12px;
+  border: 0; background: none; font-family: inherit; cursor: pointer;
+  border-radius: var(--r-md);
+  font-size: 15px; font-weight: 800; color: var(--ink); text-align: left;
+  transition: background-color var(--t-fast) var(--ease);
+}
+.side-menu__toggle:hover { background: var(--surface); }
+.side-menu__current { display: flex; align-items: center; gap: 12px; flex-grow: 1; min-width: 0; }
+.side-menu__current .icon { color: var(--green-700); }
+.side-menu__chev { color: var(--muted); transition: transform var(--t-fast) var(--ease); }
+.side-menu.is-open .side-menu__chev { transform: rotate(180deg); }
+.side-menu.is-open .side-menu__list { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--line); animation: pop-in var(--t-fast) var(--ease); }
+
+/* Dropdown menus (js/core/nav.js): <div class="dropdown" data-dropdown> toggle + .dropdown__panel */
+.dropdown { position: relative; }
+.dropdown__panel {
+  position: absolute; right: 0; top: calc(100% + 10px); z-index: 30;
+  min-width: 220px;
+  padding: 8px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-float);
+  transform-origin: top right;
+  animation: pop-in var(--t-fast) var(--ease);
+}
+@keyframes pop-in { from { opacity: 0; transform: translateY(-4px) scale(.98); } to { opacity: 1; transform: none; } }
+.menu-item {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; min-height: 40px; padding: 0 10px;
+  border: 0; border-radius: var(--r-md);
+  background: none;
+  color: var(--text);
+  font-size: 15px; font-weight: 700; text-align: left;
+}
+.menu-item .icon { flex: none; color: var(--muted); }
+.menu-item:hover { background: var(--surface); color: var(--ink); }
+.menu-item:hover .icon { color: var(--green-700); }
+.menu-item .count { margin-left: auto; }
+.menu-item__text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.menu-sep { height: 1px; margin: 6px 0; background: var(--line); }
+.menu-label { display: block; padding: 8px 10px 4px; color: var(--muted); font-size: 12.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }

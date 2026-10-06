@@ -1,0 +1,38 @@
+{% extends "dashboard/_layout.html" %}
+{% load ui humanize %}
+{% block title %}Application from {{ req.first_name }} {{ req.last_name }}{% endblock %}
+
+{% block manage %}
+<nav class="crumbs" aria-label="Breadcrumb">
+  <a href="{% url 'provider_requests' %}">Provider applications</a>{% icon "chev-right" %}<span aria-current="page">{{ req.first_name }} {{ req.last_name }}</span>
+</nav>
+
+<article class="card card-pad application-detail">
+  <div class="application-card__who">
+    {% avatar req.user 64 %}
+    <div>
+      <h1 class="t-h2">{{ req.first_name }} {{ req.last_name }}</h1>
+      <p class="t-cap"><a href="{% url 'user_profile' req.user.id %}">@{{ req.user.username }}</a> · applied {{ req.submitted_at|date:"j F Y" }}</p>
+    </div>
+    {% if req.status == 'pending' %}<span class="chip chip-gray">{% icon "clock" %}Pending</span>{% elif req.status == 'accepted' %}<span class="chip">{% icon "check" %}Accepted</span>{% else %}<span class="chip chip-line">{% icon "x" %}Rejected</span>{% endif %}
+  </div>
+
+  <dl class="details details--grid">
+    <div><dt>Email</dt><dd>{{ req.email|default:req.user.email }}</dd></div>
+    <div><dt>Phone</dt><dd>{{ req.phone_number }}</dd></div>
+    <div><dt>University</dt><dd>{{ req.university|uni_full }}</dd></div>
+    <div><dt>Department</dt><dd>{{ req.department }}</dd></div>
+    <div><dt>CGPA</dt><dd>{{ req.cgpa }}</dd></div>
+    <div><dt>Profession</dt><dd>{{ req.profession }}</dd></div>
+    <div><dt>Gender</dt><dd>{{ req.gender }}</dd></div>
+    <div><dt>Nationality</dt><dd>{{ req.nationality }}</dd></div>
+    <div class="details__wide"><dt>Address</dt><dd>{{ req.address|linebreaksbr }}</dd></div>
+  </dl>
+
+  {% if req.status == 'pending' %}
+    {% include "providers/_application_actions.html" %}
+  {% else %}
+    <p class="notice notice-gray">{% icon "info" %}<span>This application was already {{ req.get_status_display|lower }}{% if req.reviewed_at %} {{ req.reviewed_at|naturaltime }}{% endif %}.{% if req.rejection_reason %} Reason: {{ req.rejection_reason }}{% endif %}</span></p>
+  {% endif %}
+</article>
+{% endblock %}

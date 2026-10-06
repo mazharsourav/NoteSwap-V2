@@ -1,0 +1,39 @@
+{% extends "admin/base_site.html" %}
+{% load i18n l10n admin_urls static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script src="{% static 'admin/js/cancel.js' %}" async></script>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; Reject notes
+</div>
+{% endblock %}
+
+{% block content %}
+<form method="post">{% csrf_token %}
+  {% if pending %}
+    <p>These notes stay hidden. Each provider is notified, sees your reason on the note, and can fix it and send it for review again.</p>
+    <ul>{% for note in pending %}<li>{{ note }} <span class="quiet">by {{ note.provider }}</span></li>{% endfor %}</ul>
+    {% if skipped %}<p class="quiet">{{ skipped }} other selected note{{ skipped|pluralize }} {{ skipped|pluralize:"is,are" }} already published or rejected and won’t change.</p>{% endif %}
+    {% if error %}<p class="errornote">{{ error }}</p>{% endif %}
+    <p><label for="reject-reason"><strong>Reason</strong> (the provider sees this)</label></p>
+    <p><textarea id="reject-reason" name="reason" rows="4" cols="70" maxlength="1000" required>{{ reason }}</textarea></p>
+    {% for obj in queryset %}<input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}">{% endfor %}
+    <input type="hidden" name="action" value="reject_with_reason">
+    <input type="hidden" name="post" value="yes">
+    <input type="submit" value="Reject with this reason">
+    <a href="#" class="button cancel-link">{% translate "No, take me back" %}</a>
+  {% else %}
+    <p>None of the selected notes are waiting for review, so there is nothing to reject. Published notes can be deleted with “Delete selected notes”.</p>
+    <a href="#" class="button cancel-link">{% translate "Go back" %}</a>
+  {% endif %}
+</form>
+{% endblock %}

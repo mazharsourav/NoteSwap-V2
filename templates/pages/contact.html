@@ -1,0 +1,13 @@
+{% extends "pages/_message_form.html" %}
+{% load ui %}
+{% block title %}Contact us{% endblock %}
+{% block eyebrow %}Contact{% endblock %}
+{% block heading %}Get in touch{% endblock %}
+{% block intro %}Questions, problems with a note, or anything else: send us a message and we’ll reply by email.{% endblock %}
+{% block aside %}
+  <li>{% icon "help" %}<span><strong>Looking for how something works?</strong> The <a href="{% url 'help_center' %}">Help Center</a> may already have the answer.</span></li>
+  <li>{% icon "shield" %}<span><strong>Reporting a note or comment?</strong> Include a link to it so a moderator can find it.</span></li>
+  <li>{% icon "clock" %}<span><strong>When we reply</strong> Usually within a day or two.</span></li>
+{% endblock %}
+{% block message_field %}{% include "components/_field.html" with field=form.message label="Message" %}{% endblock %}
+{% block submit %}Send Message{% endblock %}

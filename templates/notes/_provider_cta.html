@@ -1,0 +1,14 @@
+{% load ui %}{% comment %}"Have good notes on X?" box for students who could become providers. Expects: what. Optional: subject_id (the upload form starts with that subject).{% endcomment %}
+{% if not user.is_authenticated or user.user_type == 'basic' and not user.is_superuser %}
+<div class="card side-card side-card--green">
+  <h2 class="t-h3">Have good notes on {{ what }}?</h2>
+  <p class="t-small">Become a provider and help the students one year behind you.</p>
+  <a class="link-arrow" href="{% url 'become_provider' %}">Apply to be a provider{% icon "arrow" size="sm" %}</a>
+</div>
+{% elif user.user_type == 'provider' or user.is_superuser %}
+<div class="card side-card side-card--green">
+  <h2 class="t-h3">Share your notes on {{ what }}</h2>
+  <p class="t-small">Upload a PDF or images. A moderator checks it, then your followers are notified.</p>
+  <a class="link-arrow" href="{% url 'upload_note' %}{% if subject_id %}?subject={{ subject_id }}{% endif %}">Upload a note{% icon "arrow" size="sm" %}</a>
+</div>
+{% endif %}

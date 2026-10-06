@@ -1,0 +1,76 @@
+/*
+  Buttons. One primary action per view.
+  .btn + one variant: -primary (main action), -secondary (outlined), -soft (light green),
+  -ghost (text only), -light (on dark green bands).
+  Sizes: -sm (36px), default (44px), -lg (52px). -icon makes it square, -block full width.
+*/
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 20px;
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  background: none;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease),
+    box-shadow var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease);
+}
+.btn:active:not([disabled]) { transform: translateY(1px) scale(.985); }
+.btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+.btn-primary { background: var(--green-700); color: var(--white); }
+.btn-primary:hover { background: var(--green-800); color: var(--white); }
+
+.btn-secondary { background: var(--white); color: var(--ink); border-color: var(--line-strong); }
+.btn-secondary:hover { background: var(--surface); color: var(--ink); border-color: #C3CDC8; }
+
+.btn-soft { background: var(--green-50); color: var(--green-800); }
+.btn-soft:hover { background: var(--green-100); color: var(--green-800); }
+
+.btn-ghost { background: transparent; color: var(--green-700); padding: 0 10px; }
+.btn-ghost:hover { background: var(--green-50); color: var(--green-800); }
+.btn-ghost.is-plain { color: var(--text); }
+.btn-ghost.is-plain:hover { background: var(--surface); color: var(--ink); }
+
+.btn-light { background: var(--white); color: var(--green-900); }
+.btn-light:hover { background: var(--green-50); color: var(--green-900); }
+
+.btn-sm { height: 36px; padding: 0 14px; font-size: 14px; border-radius: 9px; }
+.btn-lg { height: 52px; padding: 0 26px; font-size: 16px; border-radius: var(--r-lg); }
+.btn-icon { width: 44px; padding: 0; }
+.btn-sm.btn-icon { width: 36px; }
+.btn-block { width: 100%; }
+
+.btn[disabled], .btn.is-disabled {
+  background: #EEF1EF; color: #9AA49F; border-color: transparent; cursor: not-allowed;
+}
+
+/* The arrow in "See more →" nudges on hover */
+.btn .icon-arrow, .link-arrow .icon { transition: transform var(--t-fast) var(--ease); }
+.btn:hover .icon-arrow, .link-arrow:hover .icon { transform: translateX(3px); }
+
+.link-arrow { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: var(--fs-small); }
+
+/* Follow button: "Following" turns into "Unfollow" on hover */
+.follow-btn__state { display: inline-flex; align-items: center; gap: 6px; }
+.follow-btn .follow-btn__hover { display: none; }
+.follow-btn--following:hover .follow-btn__state,
+.follow-btn--following:focus-visible .follow-btn__state { display: none; }
+.follow-btn--following:hover .follow-btn__hover,
+.follow-btn--following:focus-visible .follow-btn__hover { display: inline; }
+.follow-btn--following:hover { background: var(--white); color: var(--ink); border-color: var(--line-strong); }
+.follow-form { display: contents; }

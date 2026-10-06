@@ -1,0 +1,22 @@
+{% load ui %}{% comment %}
+  Page links for a Paginator page. Keeps the other query parameters (search, filters).
+  Usage: {% include "components/_pagination.html" with page=page %}
+{% endcomment %}{% if page.has_other_pages %}
+<nav class="pagination" aria-label="Pages">
+  {% if page.has_previous %}
+    <a class="btn btn-ghost btn-sm btn-icon" href="{% querystring page=page.previous_page_number %}" aria-label="Previous page" rel="prev">{% icon "chev-left" %}</a>
+  {% endif %}
+  {% for number in page.paginator.get_elided_page_range %}
+    {% if number == page.paginator.ELLIPSIS %}
+      <span class="page-gap" aria-hidden="true">…</span>
+    {% elif number == page.number %}
+      <span class="page-num is-current" aria-current="page">{{ number }}</span>
+    {% else %}
+      <a class="page-num" href="{% querystring page=number %}">{{ number }}</a>
+    {% endif %}
+  {% endfor %}
+  {% if page.has_next %}
+    <a class="btn btn-ghost btn-sm btn-icon" href="{% querystring page=page.next_page_number %}" aria-label="Next page" rel="next">{% icon "chev-right" %}</a>
+  {% endif %}
+</nav>
+{% endif %}

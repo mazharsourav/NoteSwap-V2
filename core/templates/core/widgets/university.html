@@ -1,0 +1,10 @@
+{% comment %}
+  UniversityWidget (core/forms.py): the list of universities, and a text box used when "Other" is picked.
+  js/core/university.js adds type-to-search and hides the text box until "Other" is chosen.
+{% endcomment %}{% with choice=widget.subwidgets.0 other=widget.subwidgets.1 %}<div class="uni-picker" data-uni-picker>
+  {% include choice.template_name with widget=choice %}
+  <div class="uni-picker__other" data-uni-other>
+    <label class="uni-picker__other-label" for="{{ other.attrs.id }}">If yours isn’t in the list, type its name</label>
+    {% include other.template_name with widget=other %}
+  </div>
+</div>{% endwith %}

@@ -1,0 +1,82 @@
+/* NoteSolve: the student's page, the provider's inbox and the answer page. */
+
+.solve-head .page-head__row { align-items: center; }
+.solve-head .chip-deep { align-self: flex-start; }
+.solve-stats { display: flex; gap: 32px; margin: 0; }
+.solve-stats div { display: flex; flex-direction: column-reverse; align-items: flex-start; }
+.solve-stats dd { margin: 0; font-size: 32px; line-height: 1.1; font-weight: 900; letter-spacing: -0.02em; color: var(--ink); }
+.solve-stats dt { font-size: var(--fs-cap); color: var(--muted); }
+
+.solve-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 32px; align-items: start; padding-top: 32px; }
+.solve-ask { display: flex; flex-direction: column; gap: 20px; scroll-margin-top: calc(var(--header-h) + 16px); }
+.solve-ask__head { display: flex; flex-direction: column; gap: 6px; }
+.solve-ask__lead, .solve-ask__open { display: none; }
+
+/* One column: past requests (the answers) come first, the form waits behind a button (js/pages/notesolve.js).
+   Without past requests, a form error or a chosen provider, the form stays open and first. */
+@media (max-width: 1000px) {
+  .solve-layout { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .solve-layout:has(.request-list) .solve-requests { order: -1; }
+  .js .solve-ask.is-collapsible:not(.is-open) .solve-form { display: none; }
+  .js .solve-ask.is-collapsible:not(.is-open) .solve-ask__lead { display: block; }
+  .js .solve-ask.is-collapsible:not(.is-open) .solve-ask__open { display: inline-flex; align-self: flex-start; margin-top: 10px; }
+  .solve-ask.is-collapsible:not(.is-open) .t-h2 { font-size: var(--fs-h3); }
+}
+.solve-form { display: flex; flex-direction: column; gap: 18px; }
+.solve-ask:target { box-shadow: var(--focus-ring); }
+.solve-requests { display: flex; flex-direction: column; gap: 14px; }
+.solve-search { width: min(320px, 100%); }
+
+/* "Who you can ask" on phones: compact rows come from the shared .provider-card (cards.css); the button just says "Ask". */
+@media (max-width: 640px) {
+  .solve-providers__name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+
+/* Your requests */
+.request-list { display: flex; flex-direction: column; gap: 10px; }
+.request-item { overflow: hidden; }
+.request-item__summary {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 18px;
+  cursor: pointer;
+  list-style: none;
+}
+.request-item__summary::-webkit-details-marker { display: none; }
+.request-item__summary:hover { background: #F9FBFA; }
+.request-item__title { display: flex; flex-direction: column; gap: 2px; flex-grow: 1; min-width: 0; }
+.request-item__chev { color: var(--muted); transition: transform var(--t-fast) var(--ease); }
+.request-item[open] .request-item__chev { transform: rotate(180deg); }
+.request-item__body { display: flex; flex-direction: column; gap: 14px; padding: 0 18px 18px; animation: pop-in var(--t-med) var(--ease); }
+.request-item--solved { border-color: var(--green-200); }
+
+.solution { display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: var(--r-lg); background: var(--green-50); }
+.solution--rejected { background: var(--surface); }
+.solution__head { display: flex; align-items: center; gap: 10px; }
+.solution__text p + p { margin-top: 8px; }
+.rated { display: inline-flex; align-items: center; gap: 8px; }
+.waiting { display: inline-flex; align-items: center; gap: 6px; }
+.resend-form { display: flex; gap: 8px; flex-wrap: wrap; }
+.resend-form select { flex: 1 1 220px; width: auto; }
+
+/* Provider inbox */
+.inbox-rows { overflow: hidden; }
+.inbox-rows > li + li { border-top: 1px solid var(--line); }
+.inbox-row { display: flex; align-items: center; gap: 14px; padding: 16px 20px; color: inherit; transition: background-color var(--t-fast) var(--ease); }
+a.inbox-row:hover { background: #F9FBFA; color: inherit; }
+.inbox-row__text { display: flex; flex-direction: column; gap: 3px; flex-grow: 1; min-width: 0; }
+.inbox-row__side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex: none; }
+@media (max-width: 600px) { .inbox-row__side .t-cap { display: none; } }
+
+/* Answer page */
+.solve-answer { gap: 20px; }
+.solve-answer__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 900px) { .solve-answer__grid { grid-template-columns: minmax(0, 1fr); } }
+.question-card { display: flex; flex-direction: column; gap: 16px; position: sticky; top: calc(var(--header-h) + 24px); }
+@media (max-width: 900px) { .question-card { position: static; } }
+.question-card__who { display: flex; align-items: center; gap: 12px; }
+.question-card__who > div { display: flex; flex-direction: column; }
+.question-card__text { color: var(--ink); overflow-wrap: anywhere; }
+.question-card__text p + p { margin-top: 10px; }
+.reject-panel__summary { display: flex; justify-content: space-between; align-items: center; cursor: pointer; list-style: none; }
+.reject-panel__summary::-webkit-details-marker { display: none; }
+.reject-panel[open] .reject-panel__summary .icon { transform: rotate(180deg); }

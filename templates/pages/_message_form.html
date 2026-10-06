@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% comment %}
+  Contact, Send feedback and Ask a question share this page. Child templates set the blocks
+  title, intro, message_label, message_hint, submit and aside.
+{% endcomment %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/pages.css' %}">{% endblock %}
+
+{% block content %}
+<div class="wrap section message-page">
+  <div class="message-page__intro">
+    <span class="eyebrow">{% block eyebrow %}Help{% endblock %}</span>
+    <h1 class="t-h1">{% block heading %}{% endblock %}</h1>
+    <p class="t-lead">{% block intro %}{% endblock %}</p>
+    <ul class="message-page__aside">{% block aside %}{% endblock %}</ul>
+  </div>
+  <form class="card form-card" method="post">
+    {% csrf_token %}
+    {% include "components/_form_errors.html" %}
+    <div class="field-row">
+      {% include "components/_field.html" with field=form.name label="Your name" %}
+      {% include "components/_field.html" with field=form.email label="Email" hint="We reply to this address." %}
+    </div>
+    {% block message_field %}{% include "components/_field.html" with field=form.message %}{% endblock %}
+    <div class="form-actions"><button class="btn btn-primary" type="submit">{% icon "send" size="sm" %}{% block submit %}Send{% endblock %}</button></div>
+  </form>
+</div>
+{% endblock %}

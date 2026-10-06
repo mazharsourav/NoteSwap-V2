@@ -1,0 +1,6 @@
+{% comment %}
+  A drawn "cover" for a note (note files are private, so there are no real thumbnails).
+  The colour and pattern follow the subject (6 looks, picked from the subject id), so notes from
+  different subjects look different at a glance. Styles: css/components/cards.css (.cover).
+  Needs: note (with subject selected). Optional: size="sm" for small thumbnails (no text), cls="…".
+{% endcomment %}{% with sid=note.subject_id %}<span class="cover cover--{% if sid|divisibleby:6 %}a{% elif sid|add:1|divisibleby:6 %}b{% elif sid|add:2|divisibleby:6 %}c{% elif sid|add:3|divisibleby:6 %}d{% elif sid|add:4|divisibleby:6 %}e{% else %}f{% endif %}{% if size == 'sm' %} cover--sm{% endif %}{% if cls %} {{ cls }}{% endif %}" aria-hidden="true"><span class="cover__sheet">{% if size != 'sm' %}<span class="cover__subject">{{ note.subject.name }}</span><span class="cover__title">{{ note.name }}</span>{% endif %}<i></i><i></i><i></i><i></i></span></span>{% endwith %}

@@ -1,0 +1,30 @@
+{% extends "allauth/layouts/entrance.html" %}
+{% comment %}"Complete your profile": shown once to a new user signing in with Google.{% endcomment %}
+{% block head_title %}Complete your profile{% endblock %}
+
+{% block content %}
+<div class="auth__head">
+  <span class="eyebrow">Almost done</span>
+  <h1 class="t-h1">Complete your profile</h1>
+  <p class="muted">You’re signing up with your {{ account.get_provider.name }} account. Tell us a little about yourself so we can show you the right notes.</p>
+</div>
+
+<form class="auth-form" method="post" action="{% url 'socialaccount_signup' %}" novalidate>
+  {% csrf_token %}
+  {{ redirect_field }}
+  {% include "components/_form_errors.html" %}
+  <div class="field-row">
+    {% include "components/_field.html" with field=form.first_name label="First name" %}
+    {% include "components/_field.html" with field=form.last_name label="Last name" %}
+  </div>
+  {% include "components/_field.html" with field=form.username label="Username" hint="Shown on your comments and reviews." %}
+  {% include "components/_field.html" with field=form.email label="Email" %}
+  <div class="field-row">
+    {% include "components/_field.html" with field=form.university label="University" %}
+    {% include "components/_field.html" with field=form.gender label="Gender" %}
+  </div>
+  <button class="btn btn-primary btn-lg btn-block" type="submit">Finish sign up</button>
+</form>
+
+<p class="auth__switch t-small muted">Already have a NoteSwap account? <a class="strong" href="{% url 'account_login' %}">Sign in</a> first, then connect Google from your account settings.</p>
+{% endblock %}

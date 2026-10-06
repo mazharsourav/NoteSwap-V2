@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static ui humanize %}
+{% block title %}Files of “{{ note.name }}”{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/notes.css' %}">{% endblock %}
+
+{% block content %}
+{% url 'note_file' note.id as main_url %}
+<div class="wrap wrap-form form-page">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="{% url 'note_detail' note.id %}">{{ note.name|truncatechars:50 }}</a>{% icon "chev-right" %}<span aria-current="page">Files</span>
+  </nav>
+  <div class="form-page__head">
+    <h1 class="t-h1">Files</h1>
+    <p class="muted">Readers see these as one document, in this order. Remove a file you uploaded by mistake, or add more pages.</p>
+  </div>
+
+  {# ---- The note's files, in reading order ---- #}
+  <ol class="card note-files" aria-label="Files of this note">
+    <li class="note-files__row">
+      <span class="note-files__number">1</span>
+      {% if note.note_type == 'image' %}<img class="note-files__thumb" src="{{ main_url }}" alt="" loading="lazy">{% else %}<span class="note-files__thumb note-files__thumb--doc">{% icon "file" %}</span>{% endif %}
+      <span class="note-files__text">
+        <span class="t-small ink strong">{{ note.file.name|cut:"notes/" }}</span>
+        <span class="t-cap">Main file{% if not note.is_verified %} · waiting for review{% endif %}</span>
+      </span>
+      <span class="note-files__actions">
+        <a class="btn btn-ghost btn-sm btn-icon is-plain" href="{{ main_url }}" target="_blank" rel="noopener" aria-label="Open {{ note.file.name|cut:'notes/' }}" title="Open">{% icon "external" size="sm" %}</a>
+        <a class="btn btn-ghost btn-sm is-plain" href="{% url 'edit_note' note.id %}" title="Upload a different main file on the edit page">{% icon "edit" size="sm" %}Replace</a>
+      </span>
+    </li>
+    {% for extra in extra_files %}
+      {% url 'note_extra_file' extra.id as extra_url %}
+      {% with name=extra.file.name|cut:"notes/" %}
+      <li class="note-files__row">
+        <span class="note-files__number">{{ forloop.counter|add:1 }}</span>
+        {% if name|lower|slice:"-4:" == ".pdf" %}<span class="note-files__thumb note-files__thumb--doc">{% icon "file" %}</span>{% else %}<img class="note-files__thumb" src="{{ extra_url }}" alt="" loading="lazy">{% endif %}
+        <span class="note-files__text">
+          <span class="t-small ink strong">{{ name }}</span>
+          <span class="t-cap">{% if extra.is_verified %}Added {{ extra.uploaded_at|naturaltime }}{% else %}Waiting for review{% endif %}</span>
+        </span>
+        <span class="note-files__actions">
+          <a class="btn btn-ghost btn-sm btn-icon is-plain" href="{{ extra_url }}" target="_blank" rel="noopener" aria-label="Open {{ name }}" title="Open">{% icon "external" size="sm" %}</a>
+          <form method="post" action="{% url 'delete_note_file' note.id extra.id %}">
+            {% csrf_token %}
+            <button class="btn btn-ghost btn-sm is-plain note-files__delete" type="submit" data-confirm="Remove “{{ name }}” from this note? This can’t be undone." aria-label="Delete {{ name }}">{% icon "trash" size="sm" %}<span>Delete</span></button>
+          </form>
+        </span>
+      </li>
+      {% endwith %}
+    {% endfor %}
+  </ol>
+  <p class="hint note-files__hint">The main file can’t be deleted on its own: replace it, or <a href="{% url 'delete_note' note.id %}">delete the whole note</a>.</p>
+
+  {# ---- Add more ---- #}
+  <form class="card form-card" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <h2 class="t-h3">Add files</h2>
+    {% include "components/_form_errors.html" %}
+    {% include "components/_file_field.html" with field=form.files label="Files" multiple=True hint=files_hint %}
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">{% icon "upload" size="sm" %}Add files</button>
+      <a class="btn btn-ghost is-plain" href="{% url 'note_detail' note.id %}">Back to the note</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

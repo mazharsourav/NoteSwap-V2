@@ -1,0 +1,25 @@
+{% load ui %}{% comment %}
+  "Add a course" pop-up for the upload and edit forms, so a half-filled note isn't lost.
+  Kept outside the note <form> (forms can't be nested). js/pages/note-form.js sends them with fetch();
+  without JavaScript the link opens the normal add-subject page instead.
+{% endcomment %}
+{% if user.user_type == 'provider' or user.is_superuser %}
+<dialog class="dialog" id="add-subject-dialog" aria-labelledby="add-subject-title">
+  <form class="dialog__body" method="post" action="{% url 'add_subject' %}" data-place-form="subject">
+    {% csrf_token %}
+    <div class="dialog__head">
+      <div>
+        <h2 class="t-h2" id="add-subject-title">Add a course</h2>
+        <p class="t-small muted">Just the name, like “Data Communication”. It’s shared by every university; your note says your university and course code.</p>
+      </div>
+      <button class="btn btn-ghost btn-icon dialog__close" type="button" data-dialog-close aria-label="Close">{% icon "x" %}</button>
+    </div>
+    <div class="notice notice-gray" data-place-error hidden></div>
+    {% include "components/_field.html" with field=new_subject_form.name label="Course name" %}
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">Add course</button>
+      <button class="btn btn-ghost is-plain" type="button" data-dialog-close>Cancel</button>
+    </div>
+  </form>
+</dialog>
+{% endif %}

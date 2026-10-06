@@ -1,0 +1,224 @@
+/*
+  Form fields. Use .input on a control, or put plain Django widgets inside .field and they
+  get the same look without extra classes.
+  Errors are ink, not red: a dark border, an alert icon and bold text.
+*/
+.field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.field-row { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); }
+
+.label { font-size: var(--fs-small); line-height: 1.3; font-weight: 800; color: var(--ink); }
+.label .optional { font-weight: 600; color: var(--muted); }
+.hint { font-size: var(--fs-cap); line-height: 1.45; color: var(--muted); }
+
+.input,
+.field input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]),
+.field select,
+.field textarea {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--white);
+  color: var(--ink);
+  font-size: 15px;
+  transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+.input::placeholder, .field input::placeholder, .field textarea::placeholder { color: var(--placeholder); }
+.input:hover, .field input:hover, .field select:hover, .field textarea:hover { border-color: #BCC7C1; }
+.input:focus, .field input:focus, .field select:focus, .field textarea:focus {
+  outline: none;
+  border-color: var(--green-500);
+  box-shadow: 0 0 0 4px rgba(14, 181, 130, .16);
+}
+textarea.input, .field textarea { height: auto; min-height: 112px; padding: 12px 14px; line-height: 1.55; resize: vertical; }
+
+/* Native selects get a custom chevron */
+select.input, .field select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2366726C' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px;
+}
+
+/* Search box with a leading icon */
+.search { position: relative; display: flex; align-items: center; }
+.search > .icon { position: absolute; left: 15px; color: var(--muted); pointer-events: none; }
+.search .input { padding-left: 46px; }
+
+/* Checkbox and radio rows */
+.check { display: inline-flex; align-items: center; gap: 10px; font-size: var(--fs-small); font-weight: 600; color: var(--text); cursor: pointer; }
+.check input { width: 18px; height: 18px; margin: 0; accent-color: var(--green-700); }
+
+/* File input */
+.field input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  font-size: var(--fs-small);
+}
+.field input[type="file"]::file-selector-button {
+  margin-right: 12px; height: 34px; padding: 0 14px;
+  border: 1px solid var(--line-strong); border-radius: var(--r-sm);
+  background: var(--white); color: var(--ink); font-weight: 800; cursor: pointer;
+}
+
+/* Errors */
+.input.is-error, .field.has-error input, .field.has-error select, .field.has-error textarea {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+.field-error, .errorlist li {
+  display: flex; align-items: flex-start; gap: 6px;
+  font-size: var(--fs-cap); line-height: 1.45; font-weight: 700; color: var(--ink);
+}
+.field-error .icon { width: 16px; height: 16px; margin-top: 1px; }
+.errorlist { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+
+/* A box above the form for errors that aren't about one field */
+.form-alert {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 14px 16px;
+  border: 1px solid var(--ink);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--fs-small);
+  font-weight: 700;
+}
+
+.form-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding-top: 8px; }
+
+/* ---------- Form pages: a narrow column with a title and one card ---------- */
+.form-page { display: flex; flex-direction: column; gap: 24px; padding-block: clamp(32px, 5vw, 56px) var(--section-gap); }
+.form-page__head { display: flex; flex-direction: column; gap: 10px; }
+.form-card { display: flex; flex-direction: column; gap: 24px; padding: clamp(20px, 4vw, 32px); }
+.form-section { display: flex; flex-direction: column; gap: 18px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.form-section + .form-section { padding-top: 24px; box-shadow: inset 0 1px 0 var(--line); } /* the floated legend is plain content, so the padding sits above it */
+.form-section__title { float: left; width: 100%; padding: 0; margin-bottom: 2px; font-size: var(--fs-cap); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.field-row--3 { grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr)); }
+/* Phones: two fields per line, and a third one alone takes the whole line instead of a half-width gap */
+@media (max-width: 640px) {
+  .field-row--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .field-row--3 > :nth-child(3):last-child { grid-column: 1 / -1; }
+}
+.hint-link { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; font-size: var(--fs-cap); font-weight: 800; }
+.btn.is-busy { opacity: .7; cursor: progress; }
+
+/* File drop zone (components/_file_field.html) */
+.dropzone {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 28px 20px;
+  border: 1.5px dashed var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease);
+}
+.dropzone:hover, .dropzone.is-over { border-color: var(--green-500); background: var(--green-50); }
+.dropzone input[type="file"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.dropzone:focus-within { border-color: var(--green-500); box-shadow: 0 0 0 4px rgba(14, 181, 130, .16); }
+.dropzone__icon {
+  width: 44px; height: 44px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--r-pill);
+  background: var(--white); color: var(--green-700);
+  border: 1px solid var(--line);
+  transition: transform var(--t-med) var(--ease);
+}
+.dropzone:hover .dropzone__icon, .dropzone.is-over .dropzone__icon { transform: translateY(-3px); }
+.dropzone__text { font-size: var(--fs-small); color: var(--text); }
+.dropzone__text strong { color: var(--green-700); }
+.dropzone__file { font-size: var(--fs-small); font-weight: 800; color: var(--ink); overflow-wrap: anywhere; }
+.dropzone.has-file { border-style: solid; border-color: var(--green-500); background: var(--green-50); }
+.field.has-error .dropzone { border-color: var(--ink); }
+
+/* "Are you sure?" card */
+.confirm-card { align-items: flex-start; gap: 16px; }
+.confirm-card__icon {
+  width: 52px; height: 52px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--r-pill);
+  background: var(--gray-100); color: var(--ink);
+}
+
+/* A status in place of a form ("You're a provider", "Waiting for review") */
+.status-card { align-items: flex-start; gap: 14px; }
+.status-card__icon {
+  width: 52px; height: 52px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--r-pill);
+  background: var(--green-50); color: var(--green-700);
+}
+
+/* "1 → 2 → 3" above a form */
+.steps-row { display: flex; flex-wrap: wrap; gap: 10px 24px; font-size: var(--fs-small); font-weight: 700; color: var(--text); }
+.steps-row li { display: inline-flex; align-items: center; gap: 10px; }
+.steps-row span {
+  width: 26px; height: 26px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--r-pill);
+  background: var(--green-700); color: var(--white);
+  font-size: 13px; font-weight: 900;
+}
+
+/* Star rating picker (note page, NoteSolve solutions) */
+.rate-form { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.rate-form fieldset { margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 6px; }
+.rate-form legend { padding: 0; margin-bottom: 6px; }
+.js .rate-form__save { display: none; }
+.rate-form__saved { display: inline-flex; align-items: center; gap: 6px; color: var(--green-800); font-weight: 700; }
+
+/* Star picker: inputs are in reverse order so "this star and all before it" can be styled with ~ */
+.rate { display: inline-flex; flex-direction: row-reverse; justify-content: flex-end; margin-left: -6px; }
+.rate label { width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--r-md); cursor: pointer; }
+.rate .star { --star: 28px; transition: transform var(--t-fast) var(--ease), fill var(--t-fast) var(--ease), stroke var(--t-fast) var(--ease); }
+.rate input:checked ~ label .star,
+.rate label:hover .star,
+.rate label:hover ~ label .star { fill: var(--green-500); stroke: var(--green-500); }
+.rate:hover input:checked ~ label .star { fill: none; stroke: #BFC9C4; }
+.rate:hover label:hover .star, .rate:hover label:hover ~ label .star { fill: var(--green-500); stroke: var(--green-500); }
+.rate label:hover .star { transform: scale(1.12); }
+.rate input:focus-visible + label { box-shadow: var(--focus-ring); }
+
+/* Pages drawn by django-allauth (templates/allauth/elements/) */
+.allauth-form { display: flex; flex-direction: column; gap: 18px; }
+.allauth-title { font-size: var(--fs-h1); }
+.settings-card .allauth-title { font-size: var(--fs-h2); }
+.allauth-subtitle { margin-top: 8px; }
+.allauth-text { color: var(--text); }
+.allauth-hr { margin: 4px 0; }
+.provider-list { display: flex; flex-direction: column; gap: 10px; }
+
+/* University picker (UniversityField + js/core/university.js): type to search the list, "Other" opens a text box */
+/* The search box looks like the dropdown it replaces: same arrow as select.input (the long selector
+   outranks the .field input rule above, which would reset the background) */
+.uni-picker input.uni-picker__search:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]) {
+  padding-right: 40px; cursor: pointer;
+  background: var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2366726C' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center / 18px;
+}
+.uni-picker input.uni-picker__search:focus { cursor: text; }
+.uni-picker { position: relative; display: flex; flex-direction: column; gap: 8px; }
+.uni-picker__other { display: flex; flex-direction: column; gap: 6px; }
+.uni-picker__other-label { font-size: var(--fs-cap); font-weight: 700; color: var(--muted); }
+.uni-picker.is-enhanced .uni-picker__other-label { color: var(--text); }
+.uni-picker__list {
+  position: absolute; left: 0; right: 0; top: 50px; z-index: 40;
+  max-height: min(320px, 50vh); overflow-y: auto;
+  margin: 0; padding: 6px; list-style: none;
+  background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg);
+  box-shadow: var(--shadow-float);
+}
+.uni-picker__group { padding: 10px 10px 4px; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.uni-picker__option { padding: 9px 10px; border-radius: var(--r-md); font-size: var(--fs-small); color: var(--text); cursor: pointer; }
+.uni-picker__option:hover, .uni-picker__option.is-active { background: var(--green-50); color: var(--ink); }
+.uni-picker__option[aria-selected="true"] { font-weight: 800; color: var(--green-800); }
+.uni-picker__option.is-other { margin-top: 4px; border-top: 1px solid var(--line); border-radius: 0 0 var(--r-md) var(--r-md); font-weight: 700; color: var(--green-700); }
+.uni-picker__empty { padding: 10px; font-size: var(--fs-small); color: var(--muted); }

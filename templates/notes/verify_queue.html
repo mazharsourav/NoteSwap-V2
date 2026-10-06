@@ -1,0 +1,98 @@
+{% extends "dashboard/_layout.html" %}
+{% load static ui humanize %}
+{% block title %}Review notes{% endblock %}
+
+{% block manage %}
+<div class="manage-head">
+  <div>
+    <h1 class="t-h1">Review notes</h1>
+    <p class="muted">Open each file before approving. Approved notes go live and the provider’s followers are notified. Rejected notes stay with the provider, who sees your reason and can fix and resend them. Rejected extra files are removed.</p>
+  </div>
+</div>
+
+<section class="card table-card" aria-labelledby="notes-title">
+  <form method="post" data-select-group>
+    {% csrf_token %}
+    <input type="hidden" name="verify_type" value="main">
+    <div class="table-card__head">
+      <h2 class="t-h3" id="notes-title">New and changed notes <span class="count">{{ unverified_notes|length }}</span></h2>
+      {% if unverified_notes %}
+        <div class="cluster">
+          <details class="reject-box">
+            <summary class="btn btn-secondary btn-sm">Reject selected…</summary>
+            <div class="reject-box__form">
+              <label class="label" for="note-reject-reason">Reason (the provider sees this)</label>
+              <textarea class="input" id="note-reject-reason" name="reason" rows="2" maxlength="1000" placeholder="e.g. The scan is too blurry to read; please upload a clearer file."></textarea>
+              <button class="btn btn-primary btn-sm" type="submit" name="action" value="reject" data-requires-reason>Reject notes</button>
+            </div>
+          </details>
+          <button class="btn btn-primary btn-sm" type="submit" name="action" value="verify">Approve selected</button>
+        </div>
+      {% endif %}
+    </div>
+    {% if unverified_notes %}
+      <div class="table-scroll">
+        <table class="table table--stack">
+          <thead><tr><th class="table-check"><label class="visually-hidden" for="all-notes">Select all notes</label><input type="checkbox" id="all-notes" data-select-all><label class="table-check__all" for="all-notes" aria-hidden="true">Select all</label></th><th>Note</th><th>Provider</th><th>Course</th><th>Sent</th><th class="is-right">File</th></tr></thead>
+          <tbody>
+            {% for note in unverified_notes %}
+              <tr>
+                <td class="table-check"><input type="checkbox" name="note_ids" value="{{ note.id }}" id="note-{{ note.id }}" aria-label="Select {{ note.name }}"></td>
+                <td><label class="table-note" for="note-{{ note.id }}">{% include "components/_note_cover.html" with size="sm" cls="table-note__doc" %}<span class="table-note__text"><span class="t-small ink strong">{{ note.name }}</span><span class="t-cap">{{ note.get_note_type_display }}{% if note.caption %} · {{ note.caption|truncatechars:60 }}{% endif %}</span></span></label></td>
+                <td class="stack-start"><span class="table-person">{% avatar note.provider 26 %}{{ note.provider|display_name }}</span></td>
+                <td class="t-small">{{ note.subject.name }} · {{ note.university|uni_short }}{% if note.course_code %} · {{ note.course_code }}{% endif %}</td>
+                <td class="t-small muted stack-end">{{ note.uploaded_at|naturaltime }}</td>
+                <td class="is-right">
+                  <a class="btn btn-ghost btn-sm is-plain" href="{% url 'note_detail' note.id %}">{% icon "eye" size="sm" %}Note page</a>
+                  {% if note.file %}<a class="btn btn-ghost btn-sm is-plain" href="{% url 'note_file' note.id %}" target="_blank" rel="noopener">{% icon "external" size="sm" %}File</a>{% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="table-card__empty"><div class="empty"><span class="empty__icon">{% icon "check" %}</span><span class="empty__title">No notes waiting</span><p>New and changed notes show up here.</p></div></div>
+    {% endif %}
+  </form>
+</section>
+
+<section class="card table-card" id="files" aria-labelledby="files-title">
+  <form method="post" data-select-group>
+    {% csrf_token %}
+    <input type="hidden" name="verify_type" value="extra">
+    <div class="table-card__head">
+      <h2 class="t-h3" id="files-title">Extra files <span class="count">{{ unverified_files|length }}</span></h2>
+      {% if unverified_files %}
+        <div class="cluster">
+          <button class="btn btn-secondary btn-sm" type="submit" name="action" value="reject" data-confirm="Reject and remove the selected files? This can't be undone.">Reject selected</button>
+          <button class="btn btn-primary btn-sm" type="submit" name="action" value="verify">Approve selected</button>
+        </div>
+      {% endif %}
+    </div>
+    {% if unverified_files %}
+      <div class="table-scroll">
+        <table class="table table--stack">
+          <thead><tr><th class="table-check"><label class="visually-hidden" for="all-files">Select all files</label><input type="checkbox" id="all-files" data-select-all><label class="table-check__all" for="all-files" aria-hidden="true">Select all</label></th><th>File</th><th>For note</th><th>Provider</th><th>Sent</th><th class="is-right">File</th></tr></thead>
+          <tbody>
+            {% for file in unverified_files %}
+              <tr>
+                <td class="table-check"><input type="checkbox" name="file_ids" value="{{ file.id }}" id="file-{{ file.id }}" aria-label="Select file for {{ file.note.name }}"></td>
+                <td><label class="t-small ink strong" for="file-{{ file.id }}">{{ file.file.name|cut:"notes/"|truncatechars:40 }}</label></td>
+                <td class="t-small" data-label="For"><a href="{% url 'note_detail' file.note.id %}">{{ file.note.name }}</a></td>
+                <td class="stack-start"><span class="table-person">{% avatar file.note.provider 26 %}{{ file.note.provider|display_name }}</span></td>
+                <td class="t-small muted stack-end">{{ file.uploaded_at|naturaltime }}</td>
+                <td class="is-right"><a class="btn btn-ghost btn-sm is-plain" href="{% url 'note_extra_file' file.id %}" target="_blank" rel="noopener">{% icon "external" size="sm" %}Open</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="table-card__empty"><div class="empty"><span class="empty__icon">{% icon "check" %}</span><span class="empty__title">No files waiting</span><p>Extra files that providers add to their notes show up here.</p></div></div>
+    {% endif %}
+  </form>
+</section>
+{% endblock %}
+
+{% block scripts %}<script src="{% static 'js/pages/manage.js' %}" defer></script>{% endblock %}

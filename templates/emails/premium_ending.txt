@@ -1,0 +1,4 @@
+{% extends "emails/_base.txt" %}{% block content %}Your Premium ends on {{ user.premium_until|date:"j M Y" }}.
+
+Renew before then to keep asking providers on NoteSolve. A new plan starts when the current one ends, so you won't lose any days:
+{{ link }}{% endblock %}

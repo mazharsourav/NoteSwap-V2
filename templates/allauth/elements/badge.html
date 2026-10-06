@@ -1,0 +1,1 @@
+{% load allauth %}<span class="chip chip-sm{% if 'warning' in attrs.tags or 'unverified' in attrs.tags %} chip-gray{% elif 'primary' in attrs.tags %} chip-line{% endif %}"{% if attrs.title %} title="{{ attrs.title }}"{% endif %}>{% slot %}{% endslot %}</span>

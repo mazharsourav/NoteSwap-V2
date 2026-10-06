@@ -1,0 +1,52 @@
+{% extends "dashboard/_layout.html" %}
+{% load ui humanize %}
+{% block title %}Inbox{% endblock %}
+
+{% block manage %}
+<div class="manage-head">
+  <div>
+    <h1 class="t-h1">Inbox</h1>
+    <p class="muted">Messages from the Contact, Feedback and Ask a question forms. Reply by email, then mark them resolved.</p>
+  </div>
+</div>
+
+<div class="inbox-filters">
+  <nav class="tabs" aria-label="Message status">
+    <a class="tab{% if status == 'open' %} is-active{% endif %}" href="?status=open&kind={{ kind }}">Open <span class="count{% if open_count %} count-g{% endif %}">{{ open_count }}</span></a>
+    <a class="tab{% if status == 'resolved' %} is-active{% endif %}" href="?status=resolved&kind={{ kind }}">Resolved</a>
+    <a class="tab{% if status == 'all' %} is-active{% endif %}" href="?status=all&kind={{ kind }}">All</a>
+  </nav>
+  <div class="cluster" aria-label="Message type">
+    <a class="chip{% if kind %} chip-line{% endif %}" href="?status={{ status }}">All types</a>
+    {% for value, label in kinds %}
+      <a class="chip{% if kind != value %} chip-line{% endif %}" href="?status={{ status }}&kind={{ value }}">{{ label }}</a>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="inbox-list">
+  {% for message in page %}
+    <article class="card inbox-message{% if message.is_resolved %} is-resolved{% endif %}">
+      <header class="inbox-message__head">
+        <span class="chip chip-sm{% if message.kind != 'question' %} chip-gray{% endif %}">{{ message.get_kind_display }}</span>
+        <strong class="ink">{{ message.name }}</strong>
+        <a class="t-small" href="mailto:{{ message.email }}">{{ message.email }}</a>
+        {% if message.user %}<a class="t-small muted" href="{% url 'user_profile' message.user.id %}">@{{ message.user.username }}</a>{% endif %}
+        <time class="t-cap inbox-message__time" datetime="{{ message.created_at|date:'c' }}" title="{{ message.created_at|date:'j M Y, H:i' }}">{{ message.created_at|naturaltime }}</time>
+      </header>
+      <div class="inbox-message__body">{{ message.message|linebreaks }}</div>
+      <footer class="inbox-message__actions">
+        <a class="btn btn-secondary btn-sm" href="mailto:{{ message.email }}?subject={{ 'Re: your message to NoteSwap'|urlencode }}">{% icon "mail" size="sm" %}Reply by email</a>
+        {% url 'inbox_toggle' message.id as toggle_url %}
+        <form method="post" action="{{ toggle_url }}?next={{ request.get_full_path|urlencode }}">
+          {% csrf_token %}
+          <button class="btn {% if message.is_resolved %}btn-ghost is-plain{% else %}btn-soft{% endif %} btn-sm" type="submit">{% if message.is_resolved %}Reopen{% else %}{% icon "check" size="sm" %}Mark resolved{% endif %}</button>
+        </form>
+      </footer>
+    </article>
+  {% empty %}
+    <div class="empty"><span class="empty__icon">{% icon "inbox" %}</span><span class="empty__title">{% if status == 'open' %}No open messages. You’re all caught up.{% else %}No messages here.{% endif %}</span></div>
+  {% endfor %}
+</div>
+{% include "components/_pagination.html" %}
+{% endblock %}

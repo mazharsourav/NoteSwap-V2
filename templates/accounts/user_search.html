@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}{% if query %}“{{ query }}” · Find people{% else %}Find people{% endif %}{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/notes.css' %}">{% endblock %}
+
+{% block content %}
+<section class="search-hero">
+  <div class="wrap stack" style="--stack: 20px">
+    <h1 class="t-h1">{% if query %}People matching “{{ query }}”{% else %}Find people{% endif %}</h1>
+    <form method="get" action="{% url 'search_users' %}" role="search">
+      <div class="search">
+        {% icon "search" %}
+        <input class="input" type="search" name="q" value="{{ query }}" placeholder="Name or username" aria-label="Search people"{% if not query %} autofocus{% endif %}>
+      </div>
+      <button class="btn btn-primary btn-lg" type="submit">Search</button>
+    </form>
+  </div>
+</section>
+
+<div class="wrap section" style="padding-top: 40px">
+  {% if results %}
+    <div class="mini-list">
+      {% for person in results %}
+        <a class="card lift mini-card" href="{% url 'user_profile' person.id %}">
+          {% avatar person 44 %}
+          <span class="mini-card__text">
+            <span class="t-small ink strong">{{ person|display_name }}</span>
+            <span class="t-cap">@{{ person.username }}{% if person.university %} · {{ person.university|uni_short }}{% endif %}</span>
+          </span>
+          {% if person.user_type == 'provider' %}<span class="chip chip-sm">Provider</span>{% endif %}
+        </a>
+      {% endfor %}
+    </div>
+    {% include "components/_pagination.html" with page=results %}
+  {% elif query %}
+    <div class="empty"><span class="empty__icon">{% icon "users" %}</span><span class="empty__title">No one matches “{{ query }}”</span><p>Check the spelling or try part of the name.</p></div>
+  {% else %}
+    <div class="empty"><span class="empty__icon">{% icon "users" %}</span><span class="empty__title">Type a name or username above to find people.</span><p>Looking for notes instead? <a href="{% url 'search' %}">Search notes</a></p></div>
+  {% endif %}
+</div>
+{% endblock %}

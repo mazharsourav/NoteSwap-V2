@@ -1,0 +1,17 @@
+{% load ui %}{% comment %}
+  A file field as a drop zone (js/core/forms.js shows the chosen file).
+  Usage: {% include "components/_file_field.html" with field=form.file %}
+  Optional: label, hint, optional=True (not required, e.g. when editing), current="file name",
+  multiple=True (several files at once).
+{% endcomment %}
+<div class="field{% if field.errors %} has-error{% endif %}">
+  <span class="label" id="{{ field.auto_id }}_label">{{ label|default:field.label }}{% if optional %} <span class="optional">(optional)</span>{% endif %}</span>
+  <label class="dropzone" for="{{ field.auto_id }}">
+    <input type="file" name="{{ field.html_name }}" id="{{ field.auto_id }}" accept="{{ field.field.widget.attrs.accept|default:'' }}"{% if not optional %} required{% endif %} {% if multiple %} multiple{% endif %} aria-labelledby="{{ field.auto_id }}_label" aria-describedby="{{ field.auto_id }}_hint">
+    <span class="dropzone__icon">{% icon "upload" %}</span>
+    <span class="dropzone__text">{% if multiple %}<strong>Choose files</strong> or drag them here{% else %}<strong>Choose a file</strong> or drag it here{% endif %}</span>
+    <span class="dropzone__file" aria-live="polite"></span>
+  </label>
+  <span class="hint" id="{{ field.auto_id }}_hint">{% if current %}Current file: {{ current }}. {% endif %}{{ hint|default:"PDF, JPG, PNG or WEBP, up to 20 MB." }}</span>
+  {% for error in field.errors %}<span class="field-error">{% icon "alert" %}{{ error }}</span>{% endfor %}
+</div>

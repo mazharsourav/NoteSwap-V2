@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}{{ user_obj|display_name }}{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/account.css' %}">{% endblock %}
+
+{% block content %}
+<section class="person-head">
+  <div class="wrap person-head__inner">
+    {% avatar user_obj 96 %}
+    <div class="person-head__text">
+      <div class="cluster">
+        <h1 class="t-h1">{{ user_obj|display_name }}</h1>
+        {% if user_obj.user_type == 'provider' %}<span class="chip">{% icon "shield" %}Provider</span>{% elif user_obj.user_type == 'moderator' or user_obj.is_superuser %}<span class="chip chip-gray">Team</span>{% endif %}
+      </div>
+      <p class="muted">@{{ user_obj.username }}{% if user_obj.university %} · {{ user_obj.university|uni_full }}{% endif %}{% if user_obj.department %} · {{ user_obj.department }}{% endif %}</p>
+      {% if user_obj.user_type == 'provider' %}
+        <p class="t-small"><strong class="ink">{{ notes|length }}</strong> note{{ notes|length|pluralize }} · <strong class="ink">{{ follower_count }}</strong> follower{{ follower_count|pluralize }}</p>
+      {% endif %}
+    </div>
+    {% if user_obj.user_type == 'provider' %}
+      <div class="person-head__actions">
+        {% include "components/_follow_button.html" with provider=user_obj is_following=is_following %}
+        <a class="btn btn-secondary btn-sm" href="{% url 'provider_profile' user_obj.id %}">Provider page</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<div class="wrap section" style="padding-top: 32px">
+  {% if user_obj.user_type == 'provider' %}
+    <div class="grid grid-notes" data-reveal-stagger>
+      {% for note in notes %}
+        {% include "components/_note_card.html" %}
+      {% empty %}
+        <div class="empty"><span class="empty__icon">{% icon "file" %}</span><span class="empty__title">No published notes yet</span></div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty">
+      <span class="empty__icon">{% icon "user" %}</span>
+      <span class="empty__title">{{ user_obj.first_name|default:user_obj.username }} is a student on NoteSwap</span>
+      <p>Only providers share notes. Students rate, comment and follow.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

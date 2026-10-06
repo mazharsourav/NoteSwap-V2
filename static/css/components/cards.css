@@ -1,0 +1,288 @@
+/* Cards and the small pieces that sit on them: chips, counts, avatars, stars. */
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+}
+.card-pad { padding: clamp(20px, 3vw, 28px); }
+
+/* Whole-card links rise slightly on hover */
+.lift {
+  color: inherit;
+  transition:
+    border-color var(--t-med) var(--ease),
+    box-shadow var(--t-med) var(--ease),
+    transform var(--t-med) var(--ease);
+}
+.lift:hover { color: inherit; border-color: var(--line-strong); box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+.lift:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* Chips: subject tags and statuses */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 28px; padding: 0 11px;
+  border-radius: var(--r-pill);
+  background: var(--green-50); color: var(--green-800);
+  font-size: var(--fs-cap); line-height: 1; font-weight: 800;
+  white-space: nowrap;
+}
+.chip .icon { width: 14px; height: 14px; }
+.chip-gray { background: var(--gray-100); color: #4D5A54; }
+.chip-line { background: var(--white); border: 1px solid var(--line-strong); color: var(--text); }
+.chip-deep { background: var(--green-900); color: var(--white); }
+.chip-sm { height: 24px; padding: 0 9px; font-size: 12px; }
+a.chip { transition: border-color var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease); }
+a.chip-line:hover { border-color: var(--green-500); color: var(--green-800); background: var(--green-50); }
+
+.count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height: 22px; padding: 0 7px;
+  border-radius: var(--r-pill);
+  background: var(--gray-100); color: var(--text);
+  font-size: 12px; font-weight: 800; line-height: 1;
+}
+.count-g { background: var(--green-700); color: var(--white); }
+
+/* Avatars: {% avatar user 40 %} */
+.avatar {
+  --size: 40px;
+  width: var(--size); height: var(--size);
+  flex: none;
+  max-width: none;
+  border-radius: var(--r-pill);
+  object-fit: cover;
+}
+img.avatar { height: var(--size); background: var(--green-100); }
+span.avatar {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--green-100); color: var(--green-800);
+  font-size: calc(var(--size) * .38); font-weight: 900; letter-spacing: -0.01em; line-height: 1;
+}
+span.avatar.is-alt { background: #E7ECE9; color: var(--text); }
+
+/* Stars: {% stars value %} */
+.stars { display: inline-flex; align-items: center; gap: 2px; }
+.star { width: var(--star, 16px); height: var(--star, 16px); flex: none; fill: none; stroke: #BFC9C4; stroke-width: 1.6; stroke-linejoin: round; }
+.star.is-on { fill: var(--green-500); stroke: var(--green-500); }
+
+.rating { display: inline-flex; align-items: center; gap: 5px; font-size: var(--fs-small); font-weight: 800; color: var(--ink); }
+.rating .star { --star: 16px; }
+.rating__count { color: var(--muted); font-weight: 600; }
+
+/* Abstract document preview drawn with lines (note files are private, so no thumbnails) */
+.doc {
+  display: flex; flex-direction: column; gap: 7px;
+  overflow: hidden;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+}
+.doc i { display: block; height: 6px; border-radius: 3px; background: #E6ECE9; flex: none; }
+.doc i:nth-child(1) { height: 9px; width: 62%; border-radius: 4px; background: #C9D4CF; }
+.doc i:nth-child(2) { width: 100%; }
+.doc i:nth-child(3) { width: 94%; }
+.doc i:nth-child(4) { width: 88%; }
+.doc i:nth-child(5) { width: 97%; }
+.doc i:nth-child(6) { width: 72%; }
+.doc i:nth-child(7) { width: 90%; }
+.doc i:nth-child(8) { width: 84%; }
+.doc i:nth-child(9) { width: 96%; }
+.doc i:nth-child(10) { width: 60%; }
+.doc i:nth-child(n+11) { width: 88%; }
+/* One line per preview is "highlighted" in green */
+.doc i:nth-child(4) { background: #BFE7D6; }
+
+/* Note cover (components/_note_cover.html): a paper sheet on a backdrop whose colour and
+   pattern follow the subject, so notes from different subjects look different at a glance. */
+.cover {
+  --cv-bg: var(--green-50);
+  --cv-ink: var(--green-700);
+  --cv-pattern: none;
+  --cv-size: 14px 14px;
+  position: relative;
+  display: flex; align-items: flex-end; justify-content: center;
+  overflow: hidden;
+  background-color: var(--cv-bg);
+}
+.cover::before { content: ""; position: absolute; inset: 0; background-image: var(--cv-pattern); background-size: var(--cv-size); }
+.cover__sheet {
+  position: relative;
+  display: flex; flex-direction: column; gap: 6px;
+  overflow: hidden;
+  background: var(--white);
+  box-shadow: 0 0 0 1px rgba(22, 33, 28, .06), 0 10px 24px rgba(10, 61, 44, .14);
+}
+.cover__subject {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: 10.5px; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; color: var(--cv-ink);
+}
+.cover__title {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  margin-bottom: 4px;
+  font-size: 15px; line-height: 1.25; font-weight: 900; letter-spacing: -0.01em; color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cover__sheet i { display: block; flex: none; height: 5px; border-radius: 3px; background: #E6ECE9; }
+.cover__sheet i:nth-of-type(2) { width: 88%; }
+.cover__sheet i:nth-of-type(3) { width: 95%; background: var(--green-100); }
+.cover__sheet i:nth-of-type(4) { width: 64%; }
+
+/* Six looks, all light so they read as one family: only the tint, the pattern and the subject
+   colour on the sheet change (greens and greys only). */
+.cover--a { --cv-pattern: radial-gradient(rgba(11, 125, 87, .16) 1.4px, transparent 1.6px); }
+.cover--b { --cv-bg: var(--green-100); --cv-ink: var(--green-800); --cv-pattern: repeating-linear-gradient(45deg, rgba(11, 125, 87, .09) 0 2px, transparent 2px 12px); --cv-size: auto; }
+.cover--c { --cv-bg: var(--surface); --cv-ink: var(--text); --cv-pattern: linear-gradient(rgba(22, 33, 28, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(22, 33, 28, .06) 1px, transparent 1px); --cv-size: 16px 16px; }
+.cover--d { --cv-pattern: repeating-linear-gradient(0deg, rgba(11, 125, 87, .12) 0 1px, transparent 1px 12px); --cv-size: auto; }
+.cover--e { --cv-bg: var(--green-200); --cv-ink: var(--green-800); --cv-pattern: radial-gradient(rgba(255, 255, 255, .7) 1.4px, transparent 1.6px); }
+.cover--f { --cv-bg: var(--gray-100); --cv-ink: var(--green-800); --cv-pattern: radial-gradient(circle at 88% 18%, var(--green-200) 0 34px, transparent 35px), radial-gradient(circle at 6% 96%, var(--green-100) 0 44px, transparent 45px); --cv-size: auto; }
+
+/* Small thumbnails (lists, tables): the backdrop and a sheet with lines, no text */
+/* Patterns don't survive at this size (dots vanish, stripes don't), which made small thumbnails look
+   like different designs, so every small thumbnail gets the same look. Subject looks: big cards only. */
+.cover--sm { --cv-bg: var(--green-100); --cv-ink: var(--green-700); align-items: center; border-radius: var(--r-sm); }
+.cover--sm::before { display: none; }
+.cover--sm .cover__sheet { width: 72%; height: 76%; padding: 16% 12% 0; gap: 3px; border-radius: 2px; box-shadow: 0 0 0 1px rgba(22, 33, 28, .06), 0 3px 8px rgba(10, 61, 44, .14); }
+.cover--sm .cover__sheet i { height: 3px; border-radius: 2px; }
+.cover--sm .cover__sheet i:nth-of-type(1) { width: 70%; height: 4px; background: var(--cv-ink); opacity: .55; }
+
+/* Note card */
+.note-card { display: flex; flex-direction: column; overflow: hidden; }
+.note-card__thumb {
+  position: relative;
+  height: 148px;
+  border-bottom: 1px solid var(--line);
+}
+.note-card__thumb .cover { position: absolute; inset: 0; padding: 22px 22px 0; }
+.note-card__thumb .cover__sheet {
+  width: min(196px, 80%); height: 120px;
+  padding: 16px 16px 0;
+  border-radius: var(--r-sm) var(--r-sm) 0 0;
+  transition: transform var(--t-med) var(--ease);
+}
+.note-card:hover .note-card__thumb .cover__sheet { transform: translateY(-4px); }
+.note-card__type { position: absolute; top: 12px; right: 12px; }
+@media (max-width: 640px) {
+  .note-card__thumb { height: 124px; }
+  .note-card__thumb .cover { padding: 18px 18px 0; }
+  .note-card__thumb .cover__sheet { height: 102px; padding: 14px 14px 0; }
+}
+.note-card__body { display: flex; flex-direction: column; gap: 10px; flex-grow: 1; padding: 18px 20px 20px; }
+.note-card__tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.note-card__title { flex-grow: 1; overflow-wrap: anywhere; }
+.note-card__foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 4px; }
+.note-card__by { display: inline-flex; align-items: center; gap: 8px; min-width: 0; font-size: var(--fs-small); font-weight: 700; color: var(--text); }
+.note-card__by span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Provider card */
+.provider-card {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  padding: 24px;
+  text-align: center;
+}
+.provider-card__name { color: var(--ink); }
+.provider-card__name:hover { color: var(--green-700); }
+.provider-card__who { display: flex; flex-direction: column; gap: 2px; }
+.provider-card__stats { display: flex; gap: 14px; font-size: var(--fs-small); color: var(--text); }
+.provider-card__stats strong { color: var(--ink); }
+.provider-card .btn, .provider-card form { width: 100%; }
+.provider-card .btn { margin-top: auto; }
+/* Phones: one compact row per provider (photo, name and details, button) instead of a tall card */
+@media (max-width: 640px) {
+  .grid-providers { gap: 10px; }
+  .provider-card {
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 2px 12px;
+    padding: 12px 14px; text-align: left;
+  }
+  .provider-card > .avatar { --size: 48px !important; grid-row: span 2; }
+  .provider-card__who, .provider-card__stats { grid-column: 2; min-width: 0; }
+  .provider-card__who .t-h3 { font-size: 15px; }
+  .provider-card__stats { flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: var(--fs-cap); }
+  .provider-card > .btn, .provider-card > form, .provider-card > .follow-form > .btn { grid-column: 3; grid-row: 1 / span 2; width: auto; }
+  .provider-card .btn { width: auto; margin-top: 0; }
+}
+
+/* Subject card */
+.subject-card { display: flex; align-items: center; gap: 16px; padding: 22px; }
+.subject-card__icon {
+  width: 48px; height: 48px; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--r-lg);
+  background: var(--green-50); color: var(--green-700);
+  transition: background-color var(--t-med) var(--ease), color var(--t-med) var(--ease);
+}
+.subject-card:hover .subject-card__icon { background: var(--green-700); color: var(--white); }
+.subject-card__text { display: flex; flex-direction: column; gap: 2px; flex-grow: 1; min-width: 0; }
+.subject-card__go { color: var(--green-700); transition: transform var(--t-fast) var(--ease); }
+.subject-card:hover .subject-card__go { transform: translateX(3px); }
+
+/* Dotted light-green panel behind illustrations */
+.dots {
+  background-color: var(--green-50);
+  background-image: radial-gradient(#CBE9DA 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+
+/* Empty state */
+.empty {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 36px 24px;
+  text-align: center;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-xl);
+}
+.empty__icon {
+  width: 48px; height: 48px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--r-pill);
+  background: var(--gray-100); color: var(--muted);
+}
+.empty__title { font-size: 16px; font-weight: 800; color: var(--ink); }
+.empty p { max-width: 380px; font-size: var(--fs-small); color: var(--muted); }
+.empty .btn { margin-top: 6px; }
+.grid > .empty { grid-column: 1 / -1; }
+
+/* Dark green band with a call to action (home, about) */
+.band {
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 32px 40px;
+  padding: clamp(32px, 5vw, 56px);
+  border-radius: var(--r-3xl);
+  background: var(--green-900);
+  position: relative;
+  overflow: hidden;
+}
+.band::after {
+  content: "";
+  position: absolute; right: -80px; top: -120px;
+  width: 360px; height: 360px;
+  border-radius: 50%;
+  border: 1px solid rgba(127, 221, 181, .18);
+  box-shadow: 0 0 0 48px rgba(127, 221, 181, .04), 0 0 0 96px rgba(127, 221, 181, .03);
+  pointer-events: none;
+}
+.band__text { display: flex; flex-direction: column; gap: 14px; max-width: 620px; position: relative; z-index: 1; }
+.band .eyebrow { color: var(--green-300); }
+.band .t-h2 { color: var(--on-dark); font-size: clamp(1.625rem, 1.3rem + 1.2vw, 2.125rem); }
+.band p { color: var(--on-dark-muted); }
+.band .btn { position: relative; z-index: 1; }
+
+/* Question / answer rows (Premium, Help Center) */
+.faq-item { padding: 0; overflow: hidden; }
+.faq-item summary { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px 22px; font-weight: 800; color: var(--ink); cursor: pointer; list-style: none; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary .icon { color: var(--muted); transition: transform var(--t-fast) var(--ease); }
+.faq-item[open] summary .icon { transform: rotate(180deg); }
+.faq-item p { padding: 0 22px 18px; animation: pop-in var(--t-med) var(--ease); }
+
+/* Sidebar cards */
+.side-card { display: flex; flex-direction: column; gap: 16px; padding: 22px; }
+.side-card__title { font-size: var(--fs-cap); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.side-card--green { gap: 10px; background: var(--green-50); border-color: var(--green-200); }
+
+/* Label / value list (profile details, provider applications) */
+.details { margin: 8px 0 0; }
+.details div { display: flex; flex-direction: column; gap: 2px; padding: 14px 0; border-top: 1px solid var(--line); }
+.details dt { font-size: var(--fs-cap); font-weight: 700; color: var(--muted); }
+.details dd { margin: 0; font-weight: 700; color: var(--ink); overflow-wrap: anywhere; }
+.details--grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); column-gap: 24px; margin: 0; }
+.details__wide { grid-column: 1 / -1; }

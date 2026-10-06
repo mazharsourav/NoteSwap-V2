@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}Following{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/account.css' %}">{% endblock %}
+
+{% block main %}
+<main id="main" class="account-page">
+  <div class="wrap account-layout">
+    {% include "account/_settings_nav.html" %}
+    <div class="account-content">
+      <div class="settings-card__head">
+        <h1 class="t-h2">Providers you follow</h1>
+        <p class="t-small muted">You get a notification when one of them publishes a new note.</p>
+      </div>
+      {% if page.object_list %}
+        <div class="grid grid-providers" data-reveal-stagger>
+          {% for provider in page %}
+            <article class="card provider-card">
+              {% avatar provider 64 %}
+              <div class="provider-card__who">
+                <h2 class="t-h3"><a class="provider-card__name" href="{% url 'provider_profile' provider.id %}">{{ provider|display_name }}</a></h2>
+                <span class="t-small muted">{{ provider.university|uni_short }}</span>
+              </div>
+              <div class="provider-card__stats"><span><strong>{{ provider.note_count }}</strong> note{{ provider.note_count|pluralize }}</span></div>
+              {% include "components/_follow_button.html" with provider=provider is_following=True %}
+            </article>
+          {% endfor %}
+        </div>
+        {% include "components/_pagination.html" %}
+      {% else %}
+        <div class="empty">
+          <span class="empty__icon">{% icon "users" %}</span>
+          <span class="empty__title">You aren't following any providers yet.</span>
+          <p>Follow providers to hear about their new notes.</p>
+          <a class="btn btn-secondary btn-sm" href="{% url 'providers' %}">Browse providers</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</main>
+{% endblock %}

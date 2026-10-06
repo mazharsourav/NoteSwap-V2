@@ -1,0 +1,55 @@
+/* Page width, sections, section headings and the shared grids. */
+
+.wrap {
+  width: 100%;
+  max-width: calc(var(--page-max) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.wrap-narrow { max-width: calc(760px + 2 * var(--gutter)); }
+.wrap-form { max-width: calc(560px + 2 * var(--gutter)); }
+
+.section { padding-block: 0 var(--section-gap); }
+.section-first { padding-top: clamp(40px, 6vw, 72px); }
+.section-band {
+  padding-block: clamp(56px, 7vw, 88px);
+  margin-bottom: var(--section-gap);
+  background: var(--surface);
+  border-block: 1px solid var(--line);
+}
+
+.stack { display: flex; flex-direction: column; gap: var(--stack, 16px); }
+.cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cluster, 8px); }
+
+/* "Eyebrow + title" on the left, a link or button on the right */
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+.section-head__text { display: flex; flex-direction: column; gap: 10px; }
+.section-head__text p { max-width: 560px; }
+/* A ghost-button link ("All subjects →") has 10px padding: pull it out so its text lines up with the page edge */
+.section-head > .btn-ghost { margin-right: -10px; }
+@media (max-width: 600px) {
+  .section-head { flex-direction: column; align-items: flex-start; gap: 12px; margin-bottom: 24px; }
+  .section-head > .btn-ghost { margin-right: 0; margin-left: -10px; }
+}
+
+/* Top of an inner page: breadcrumbs, title, short description, actions */
+.page-head { padding-block: clamp(32px, 5vw, 56px) 32px; }
+.page-head__row { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; }
+.page-head__text { display: flex; flex-direction: column; gap: 10px; max-width: 720px; }
+
+/* Card grids: columns appear as space allows */
+.grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(min(var(--min, 260px), 100%), 1fr)); }
+.grid-notes { --min: 250px; }
+.grid-providers { --min: 240px; }
+.grid-subjects { --min: 320px; }
+.grid-3 { --min: 300px; }
+
+/* Grey band at the top of list pages (browse, providers, NoteSolve) */
+.browse-head { padding-block: clamp(32px, 5vw, 48px) 32px; background: var(--surface); border-bottom: 1px solid var(--line); }
+.browse-body { padding-top: 32px; }

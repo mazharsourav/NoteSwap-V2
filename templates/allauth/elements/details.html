@@ -1,0 +1,4 @@
+{% load allauth %}<details class="settings-details"{% if attrs.open %} open{% endif %}>
+  <summary>{% slot summary %}{% endslot %}</summary>
+  {% slot body %}{% endslot %}
+</details>

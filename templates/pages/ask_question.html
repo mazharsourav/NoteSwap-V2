@@ -1,0 +1,12 @@
+{% extends "pages/_message_form.html" %}
+{% load ui %}
+{% block title %}Ask a question{% endblock %}
+{% block eyebrow %}Help{% endblock %}
+{% block heading %}Ask a question{% endblock %}
+{% block intro %}Didn’t find the answer in the Help Center? Ask us here and we’ll reply by email.{% endblock %}
+{% block aside %}
+  <li>{% icon "help" %}<span><strong>Quick answers</strong> Check the <a href="{% url 'help_center' %}">Help Center</a> first; it covers accounts, notes, uploading and Premium.</span></li>
+  <li>{% icon "message" %}<span><strong>Stuck on coursework?</strong> That’s what <a href="{% url 'premium_packages' %}">NoteSolve</a> is for: providers solve problems for Premium members.</span></li>
+{% endblock %}
+{% block message_field %}{% include "components/_field.html" with field=form.message label="Your question" %}{% endblock %}
+{% block submit %}Submit{% endblock %}

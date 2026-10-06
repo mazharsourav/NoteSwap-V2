@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}Confirm {{ package.name }}{% endblock %}
+{% block styles %}<link rel="stylesheet" href="{% static 'css/pages/premium.css' %}">{% endblock %}
+
+{% block content %}
+<div class="wrap wrap-form form-page">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="{% url 'premium_packages' %}">Premium</a>{% icon "chev-right" %}<span aria-current="page">Confirm</span>
+  </nav>
+  <form class="card form-card checkout" method="post">
+    {% csrf_token %}
+    <div class="form-page__head">
+      <h1 class="t-h2">Confirm your order</h1>
+      <p class="t-small muted">{% if is_premium_user %}Check the plan, then confirm. Its months start when your current Premium ends on {{ user.premium_until|date:"j M Y" }}.{% else %}Check the plan, then confirm. Premium switches on when an admin approves the order.{% endif %}</p>
+    </div>
+    <div class="checkout__plan">
+      <span class="checkout__icon">{% icon "crown" %}</span>
+      <div class="checkout__name"><strong class="ink">{{ package.name }}</strong><span class="t-cap">{{ package.duration_in_months }} month{{ package.duration_in_months|pluralize }} of NoteSolve</span></div>
+      <span class="checkout__price">৳ {{ package.price|floatformat:0 }}</span>
+    </div>
+    <ol class="checkout__steps">
+      <li>{% icon "check" size="sm" %}Confirm the order here.</li>
+      <li>{% icon "clock" size="sm" %}An admin checks the payment, usually within a day.</li>
+      <li>{% icon "message" size="sm" %}NoteSolve unlocks on your account.</li>
+    </ol>
+    <div class="form-actions">
+      <button class="btn btn-primary btn-lg" type="submit">Confirm Purchase</button>
+      <a class="btn btn-ghost is-plain" href="{% url 'premium_packages' %}">Back to plans</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

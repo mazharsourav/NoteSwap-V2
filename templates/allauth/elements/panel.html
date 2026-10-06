@@ -1,0 +1,5 @@
+{% load allauth %}<section class="settings-panel">
+  <h2 class="t-h3">{% slot title %}{% endslot %}</h2>
+  {% slot body %}{% endslot %}
+  {% if slots.actions %}<div class="form-actions">{% for action in slots.actions %}{{ action }}{% endfor %}</div>{% endif %}
+</section>
