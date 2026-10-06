@@ -2,7 +2,12 @@
 
 A note-sharing platform for university students. Providers upload notes that admins verify, students browse and rate them, and premium users can send problems to providers through **NoteSolve**.
 
-Built with Django 5.2 (LTS) and server-rendered templates.
+**Live demo: [mazharsourav.pythonanywhere.com](https://mazharsourav.pythonanywhere.com)**
+
+[![NoteSwap home page](.github/screenshots/home.png)](https://mazharsourav.pythonanywhere.com)
+
+Built with Django 5.2 (LTS) and server-rendered templates. The demo runs on sample data: the
+[UAP BSc in CSE](https://cse.uap-bd.edu/academics/courses/) course list and made-up accounts and notes.
 
 ## Project structure
 
